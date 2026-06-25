@@ -1,0 +1,10 @@
+node_modules/
+npm-debug.log*
+.env
+.env.local
+server/data/db.json
+server/data/db.json.tmp
+*.log
+.DS_Store
+coverage/
+dist/

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AusWise Migration — Apply for Australian visas the easy way</title>
+  <meta name="description" content="AusWise Migration makes applying for Australian visas simple. Find your visa in 30 seconds, build your Statement of Purpose, read the latest Home Affairs updates, and pay official fees the right way." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦘</text></svg>" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <!-- floating background blobs -->
+  <div class="bg-decor" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+    <span class="float-icon fi-1">🛂</span>
+    <span class="float-icon fi-2">✈️</span>
+    <span class="float-icon fi-3">🦘</span>
+    <span class="float-icon fi-4">🐨</span>
+    <span class="float-icon fi-5">🌏</span>
+    <span class="float-icon fi-6">📄</span>
+  </div>
+
+  <!-- NAV -->
+  <header class="nav">
+    <a class="brand" href="#top">
+      <span class="brand-mark">🦘</span>
+      <span class="brand-name">Aus<span>Wise</span> Migration</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#finder">Find my visa</a>
+      <a href="#visas">Visas</a>
+      <a href="#sop">SOP builder</a>
+      <a href="#vevo">Check visa</a>
+      <a href="#news">Updates</a>
+      <a href="#fees">Fees</a>
+      <a href="#apply" class="nav-cta">Start now</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Open menu">☰</button>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-inner">
+        <span class="pill">🇦🇺 Onshore &amp; offshore · all visa types</span>
+        <h1>Moving to Australia,<br />made <span class="hl">simple</span>.</h1>
+        <p class="lede">
+          No confusing jargon. No 100-page PDFs. Answer a few easy questions and we’ll
+          show you the right visa, the real steps, and exactly where to pay —
+          <strong>straight to the official bodies</strong>.
+        </p>
+        <div class="hero-cta">
+          <a href="#finder" class="btn btn-primary btn-lg">🔎 Find my visa — 30 seconds</a>
+          <a href="#visas" class="btn btn-ghost btn-lg">Browse all visas</a>
+        </div>
+        <ul class="hero-stats" id="heroStats">
+          <li><strong id="statVisas">—</strong><span>visa types</span></li>
+          <li><strong>2</strong><span>onshore &amp; offshore</span></li>
+          <li><strong>100%</strong><span>official sources</span></li>
+        </ul>
+      </div>
+      <div class="hero-card glass" aria-hidden="true">
+        <div class="hc-row"><span class="hc-emoji">🛂</span><div><b>Pick your visa</b><small>Skilled, student, partner, visitor &amp; more</small></div></div>
+        <div class="hc-row"><span class="hc-emoji">📝</span><div><b>Build your SOP</b><small>Guided Statement of Purpose in minutes</small></div></div>
+        <div class="hc-row"><span class="hc-emoji">💳</span><div><b>Pay officially</b><small>Direct to Home Affairs via ImmiAccount</small></div></div>
+        <div class="hc-row"><span class="hc-emoji">📰</span><div><b>Stay updated</b><small>Latest changes from Home Affairs</small></div></div>
+      </div>
+    </section>
+
+    <!-- TRUST STRIP -->
+    <section class="trust">
+      <p>Built around the <strong>Department of Home Affairs</strong> — every visa links to the official page. We never take government fees.</p>
+    </section>
+
+    <!-- VISA FINDER -->
+    <section id="finder" class="section">
+      <div class="section-head">
+        <h2>🔎 Find my visa</h2>
+        <p>Tap the answers that fit you. We’ll suggest the visas worth exploring.</p>
+      </div>
+      <div class="finder glass" id="finder-app">
+        <div class="finder-progress"><span id="finderBar"></span></div>
+        <div id="finderBody"><!-- JS renders questions/results --></div>
+      </div>
+    </section>
+
+    <!-- VISA CATALOG -->
+    <section id="visas" class="section">
+      <div class="section-head">
+        <h2>🗂️ Every visa, explained simply</h2>
+        <p>Filter by what you need. Each card opens a plain-language guide with steps, documents and the official link.</p>
+      </div>
+
+      <div class="filters">
+        <div class="seg" id="locFilter">
+          <button data-loc="" class="active">All</button>
+          <button data-loc="onshore">In Australia (onshore)</button>
+          <button data-loc="offshore">Outside Australia (offshore)</button>
+        </div>
+        <input id="visaSearch" class="search" type="search" placeholder="Search e.g. student, partner, 189…" />
+      </div>
+      <div class="chips" id="catFilter"></div>
+
+      <div class="visa-grid" id="visaGrid"><!-- JS renders cards --></div>
+      <p class="muted center" id="visaEmpty" hidden>No visas match that filter. Try clearing your search.</p>
+    </section>
+
+    <!-- SOP BUILDER -->
+    <section id="sop" class="section">
+      <div class="section-head">
+        <h2>📝 Statement of Purpose (SOP) builder</h2>
+        <p>Answer a few prompts and we’ll draft a clean, structured SOP you can edit and download. Honest, specific statements work best — this is a starting point, not a template to copy.</p>
+      </div>
+      <div class="sop-wrap">
+        <form class="sop-form glass" id="sopForm">
+          <div class="grid-2">
+            <label>Full name<input name="fullName" required placeholder="e.g. Priya Sharma" /></label>
+            <label>Nationality<input name="nationality" placeholder="e.g. Indian" /></label>
+          </div>
+          <label>What is this statement for?
+            <select name="purpose" id="sopPurpose" required>
+              <option value="study">Study (Genuine Student statement)</option>
+              <option value="skilled">Skilled migration</option>
+              <option value="work">Employer-sponsored work</option>
+              <option value="partner">Partner / family</option>
+              <option value="visit">Visitor</option>
+              <option value="business">Business / investment</option>
+            </select>
+          </label>
+          <div class="grid-2">
+            <label>Visa subclass (optional)<input name="visaCode" placeholder="e.g. 500" /></label>
+            <label class="sop-f study" data-show="study">Course<input name="course" placeholder="e.g. Master of IT" /></label>
+            <label class="sop-f study" data-show="study">Institution<input name="institution" placeholder="e.g. University of Melbourne" /></label>
+            <label class="sop-f skilled work" data-show="skilled work">Occupation<input name="occupation" placeholder="e.g. Software Engineer" /></label>
+            <label class="sop-f work" data-show="work">Employer<input name="employer" placeholder="e.g. Acme Pty Ltd" /></label>
+            <label class="sop-f partner" data-show="partner">Partner’s name<input name="partnerName" placeholder="e.g. Alex Taylor" /></label>
+          </div>
+          <label class="sop-f study skilled visit" data-show="study skilled visit">Funds / financial capacity (optional)
+            <input name="funds" placeholder="e.g. savings of AUD 35,000 + family support" /></label>
+          <label class="sop-f study visit" data-show="study visit">Ties to your home country (optional)
+            <input name="ties" placeholder="e.g. family, a job offer to return to, property" /></label>
+          <label>Your goals / plans (optional)
+            <textarea name="goals" rows="2" placeholder="e.g. gain skills then return to lead my team back home"></textarea></label>
+          <label>Anything else to include? (optional)
+            <textarea name="extra" rows="2" placeholder="Add any extra context in your own words"></textarea></label>
+          <button class="btn btn-primary" type="submit">✨ Generate my SOP draft</button>
+          <p class="fineprint">We store only your name, purpose and subclass to improve the tool — not the free-text details.</p>
+        </form>
+        <div class="sop-output glass" id="sopOutput">
+          <div class="sop-placeholder">
+            <span class="big-emoji">📄</span>
+            <p>Your draft will appear here. Fill in the form and hit generate.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VEVO ENTITLEMENT CHECK -->
+    <section id="vevo" class="section">
+      <div class="section-head">
+        <h2>✅ Check a visa’s conditions (VEVO)</h2>
+        <p>For employers, education providers and agencies. Verify a visa holder’s work rights, study rights and conditions using the official <strong>Home Affairs Visa Entitlement Verification</strong> contract.</p>
+      </div>
+      <div class="vevo-wrap">
+        <form class="vevo-form glass" id="vevoForm">
+          <div class="vevo-mode" id="vevoMode">Checking service status…</div>
+          <label>What are you checking?
+            <select name="entitlementCategory" id="vevoCategory"></select>
+          </label>
+          <div class="grid-2">
+            <label>Given name (optional)<input name="givenName" placeholder="e.g. Skip" /></label>
+            <label>Family name *<input name="familyName" required placeholder="e.g. Intro" /></label>
+          </div>
+          <div class="grid-2">
+            <label>Passport / travel doc number *<input name="travelDocumentId" required maxlength="14" placeholder="e.g. N6129182" /></label>
+            <label>Issuing country (3-letter) *<input name="travelDocumentIssuingCountry" required maxlength="3" placeholder="e.g. AUS" style="text-transform:uppercase" /></label>
+          </div>
+          <label>Date of birth *<input name="birthDate" type="date" required /></label>
+          <button class="btn btn-primary" type="submit">🔍 Run entitlement check</button>
+          <p class="fineprint">Only check people who have consented. The live service requires organisation enrolment via Home Affairs Access Manager. In demo mode, results are simulated and clearly labelled.</p>
+        </form>
+        <div class="vevo-output glass" id="vevoOutput">
+          <div class="sop-placeholder">
+            <span class="big-emoji">🪪</span>
+            <p>Entitlement results will appear here.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEWS -->
+    <section id="news" class="section">
+      <div class="section-head">
+        <h2>📰 Visa news &amp; changes</h2>
+        <p>Important, source-linked updates. For anything brand-new, jump straight to Home Affairs.</p>
+      </div>
+      <div class="news-grid" id="newsGrid"><!-- JS --></div>
+      <div class="live-sources glass" id="liveSources"></div>
+    </section>
+
+    <!-- FEES & PAYMENTS -->
+    <section id="fees" class="section">
+      <div class="section-head">
+        <h2>💳 Fees &amp; payments — pay the official bodies directly</h2>
+        <p>Government charges go <strong>straight to the Department of Home Affairs</strong> (and other official bodies). AusWise never collects government fees.</p>
+      </div>
+      <div class="pay-grid" id="payGrid"></div>
+      <div class="safety glass">
+        <h3>🛡️ Stay safe from scams</h3>
+        <ul id="safetyTips"></ul>
+        <a id="omaraLink" class="btn btn-ghost" target="_blank" rel="noopener">Check a migration agent on the official register ↗</a>
+      </div>
+    </section>
+
+    <!-- APPLY / CONTACT -->
+    <section id="apply" class="section">
+      <div class="section-head">
+        <h2>🚀 Start your application</h2>
+        <p>Tell us your situation and we’ll point you to the right pathway. No payment needed to enquire.</p>
+      </div>
+      <div class="apply-wrap">
+        <form class="apply-form glass" id="applyForm">
+          <div class="grid-2">
+            <label>Your name<input name="name" required placeholder="Full name" /></label>
+            <label>Email<input name="email" type="email" required placeholder="you@email.com" /></label>
+          </div>
+          <div class="grid-2">
+            <label>Phone (optional)<input name="phone" placeholder="+61…" /></label>
+            <label>Nationality (optional)<input name="nationality" placeholder="e.g. Filipino" /></label>
+          </div>
+          <div class="grid-2">
+            <label>Visa you’re interested in
+              <select name="visaCode" id="applyVisa"><option value="">Not sure yet</option></select>
+            </label>
+            <label>Where are you now?
+              <select name="location">
+                <option value="">Choose…</option>
+                <option value="offshore">Outside Australia</option>
+                <option value="onshore">Inside Australia</option>
+              </select>
+            </label>
+          </div>
+          <label>Tell us about your situation
+            <textarea name="message" rows="3" placeholder="A few lines about your goals, study/work history, family in Australia, etc."></textarea></label>
+          <button class="btn btn-primary btn-lg" type="submit">Send my enquiry</button>
+        </form>
+        <aside class="apply-side glass">
+          <h3>What happens next?</h3>
+          <ol class="steps">
+            <li>We review your enquiry and suggest the best-fit visa(s).</li>
+            <li>You get a simple checklist of documents.</li>
+            <li>You lodge in <b>ImmiAccount</b> and pay Home Affairs directly.</li>
+            <li>We help you track progress and updates.</li>
+          </ol>
+          <div class="divider"></div>
+          <h3>Just have a question?</h3>
+          <form id="contactForm" class="contact-mini">
+            <input name="name" placeholder="Name" required />
+            <input name="email" type="email" placeholder="Email" required />
+            <textarea name="message" rows="2" placeholder="Your question" required></textarea>
+            <button class="btn btn-ghost" type="submit">Send message</button>
+          </form>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <a class="brand" href="#top"><span class="brand-mark">🦘</span><span class="brand-name">Aus<span>Wise</span></span></a>
+        <p class="muted">Making Australian migration simple, honest and stress-free.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#finder">Find my visa</a>
+        <a href="#visas">All visas</a>
+        <a href="#sop">SOP builder</a>
+        <a href="#news">Updates</a>
+      </div>
+      <div>
+        <h4>Official sources</h4>
+        <a href="https://immi.homeaffairs.gov.au/" target="_blank" rel="noopener">Home Affairs ↗</a>
+        <a href="https://online.immi.gov.au/lusc/login" target="_blank" rel="noopener">ImmiAccount ↗</a>
+        <a href="https://www.mara.gov.au/" target="_blank" rel="noopener">Migration agent register ↗</a>
+      </div>
+    </div>
+    <div class="disclaimer">
+      <p><strong>Important:</strong> AusWise Migration is an information and document-preparation tool. It is <strong>not</strong> a government agency and does not provide legal or migration advice. Information is general only and may change — always confirm details and current fees on the
+        <a href="https://immi.homeaffairs.gov.au/" target="_blank" rel="noopener">Department of Home Affairs</a> website. For advice tailored to your situation, consult a registered migration agent (OMARA) or an Australian legal practitioner. Government Visa Application Charges are paid directly to Home Affairs via ImmiAccount.</p>
+      <p class="muted">© <span id="year"></span> AusWise Migration. Demo project. Not affiliated with the Australian Government.</p>
+    </div>
+  </footer>
+
+  <!-- VISA MODAL -->
+  <div class="modal" id="visaModal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card glass" role="dialog" aria-modal="true">
+      <button class="modal-close" data-close aria-label="Close">✕</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="/js/app.js" type="module"></script>
+</body>
+</html>
