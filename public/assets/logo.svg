@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="AusWise Migration">
+  <defs>
+    <linearGradient id="awg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1565ff"/>
+      <stop offset="0.55" stop-color="#3aa0ff"/>
+      <stop offset="1" stop-color="#1bb38a"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="13" fill="url(#awg)"/>
+  <!-- approval swoosh / journey -->
+  <path d="M12 25.5 l7 7 L37 13.5" fill="none" stroke="#fff" stroke-width="4.6"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Southern-Cross style star -->
+  <path d="M33.4 29.6 l1.2 2.7 3 .25 -2.25 1.95 .68 2.92 -2.63-1.58 -2.63 1.58 .68-2.92 -2.25-1.95 3-.25z"
+        fill="#ffb020"/>
+</svg>

@@ -103,7 +103,8 @@ img { max-width: 100%; }
 }
 .brand { display: inline-flex; align-items: center; gap: .5rem; font-weight: 800; color: var(--ink); text-decoration: none; }
 .brand:hover { text-decoration: none; }
-.brand-mark { font-size: 1.6rem; }
+.brand-mark { font-size: 1.6rem; width: 34px; height: 34px; display: inline-block; border-radius: 10px; box-shadow: var(--shadow-sm); }
+.footer .brand-mark { box-shadow: none; }
 .brand-name { font-size: 1.15rem; letter-spacing: -0.02em; }
 .brand-name span { color: var(--ocean); }
 .nav-links { display: flex; align-items: center; gap: clamp(.6rem, 2vw, 1.4rem); }
