@@ -78,6 +78,36 @@ shape (visa status, work/study conditions, Medicare eligibility, residence, etc.
 
 Copy `.env.example` to `.env` to configure.
 
+## Deploy
+
+The app is a standard Node server that binds to `$PORT` on `0.0.0.0`, so it runs
+on essentially any host. CI (`.github/workflows/ci.yml`) runs the test suite and a
+boot check on every push/PR.
+
+**Docker (works anywhere):**
+
+```bash
+docker build -t auswise-migration .
+docker run -p 3000:3000 auswise-migration
+# → http://localhost:3000   (healthcheck: GET /api/health)
+```
+
+**Render** — push the repo and use the included `render.yaml` (New + → Blueprint),
+or deploy the `Dockerfile` as a Web Service. Health check path: `/api/health`.
+
+**Railway / Heroku-style** — the `Procfile` (`web: node server/index.js`) is picked
+up automatically; the platform injects `$PORT`.
+
+**Any VPS:**
+
+```bash
+npm ci --omit=dev && NODE_ENV=production npm start
+```
+
+Submissions persist to `server/data/db.json` (override the dir with `DATA_DIR`).
+On read-only/ephemeral filesystems the store automatically falls back to
+in-memory for the life of the process, so requests never fail.
+
 ## ⚠️ Important disclaimer
 
 AusWise Migration is an **information and document-preparation tool**. It is **not** a
