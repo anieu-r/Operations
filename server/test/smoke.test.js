@@ -95,6 +95,19 @@ try {
   const contact = await post('/api/contact', { name: 'Bob', email: 'bob@example.com', message: 'Hi' });
   check('contact accepted', contact.status === 201);
 
+  const payCfg = await get('/api/checkout/config');
+  check('checkout config lists services', payCfg.body.services.length >= 3);
+  check('checkout disabled without key (demo)', payCfg.body.enabled === false);
+
+  const session = await post('/api/checkout/session', { serviceId: 'consult-30' });
+  check('checkout session 503 when not configured', session.status === 503 && session.body.code === 'NOT_CONFIGURED');
+
+  const sessionBad = await post('/api/checkout/session', { serviceId: 'nope', email: 'x@y.com' });
+  check('checkout rejects unknown service', sessionBad.status === 503 || sessionBad.status === 400);
+
+  const stats = await get('/api/stats');
+  check('stats reports integration status', stats.body.integrations && stats.body.integrations.payments === 'off');
+
   console.log(`\n${passed} passed, ${failed} failed\n`);
 } catch (err) {
   console.error('Test run error:', err);

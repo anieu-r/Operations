@@ -39,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initVEVO();
   loadNews();
   loadPayments();
+  loadServices();
+  handlePaymentReturn();
   initForms();
   initModal();
 });
@@ -468,6 +470,81 @@ async function loadPayments() {
     .join('');
   $('#safetyTips').innerHTML = (data.safetyTips || []).map((t) => `<li>${esc(t)}</li>`).join('');
   $('#omaraLink').href = data.omaraRegisterUrl || '#';
+}
+
+/* ============================================================ services / payments */
+async function loadServices() {
+  const grid = $('#servicesGrid');
+  if (!grid) return;
+  const { data } = await api('/checkout/config');
+  const enabled = data.enabled;
+  const banner = $('#payBanner');
+  if (banner) {
+    banner.hidden = false;
+    banner.innerHTML = enabled
+      ? '🔒 <b>Secure checkout by Stripe.</b> Pay by card; you’ll get a receipt by email.'
+      : '💬 <b>Online payment isn’t switched on yet.</b> Pick a service and send a free enquiry — we’ll arrange payment with you directly.';
+    banner.classList.toggle('on', !!enabled);
+  }
+  $('#payFootnote').textContent = data.note || '';
+  grid.innerHTML = (data.services || [])
+    .map(
+      (s) => `<article class="service-card ${s.popular ? 'pop' : ''}">
+        ${s.popular ? '<span class="svc-badge">Most popular</span>' : ''}
+        <h4>${esc(s.name)}</h4>
+        <div class="svc-price">${esc(s.display)}</div>
+        <p class="svc-desc">${esc(s.description)}</p>
+        <button class="btn ${s.popular ? 'btn-primary' : 'btn-ghost'} svc-buy" data-id="${esc(s.id)}" data-name="${esc(s.name)}">
+          ${enabled ? '💳 Book &amp; pay' : '✉️ Enquire'}
+        </button>
+      </article>`
+    )
+    .join('');
+  $$('.svc-buy', grid).forEach((btn) =>
+    btn.addEventListener('click', () => (enabled ? startCheckout(btn) : goEnquire(btn.dataset.name)))
+  );
+}
+
+async function startCheckout(btn) {
+  const serviceId = btn.dataset.id;
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.textContent = 'Starting secure checkout…';
+  const { ok, status, data } = await api('/checkout/session', {
+    method: 'POST',
+    body: JSON.stringify({ serviceId }),
+  });
+  if (ok && data.url) {
+    window.location.href = data.url; // redirect to Stripe Checkout
+    return;
+  }
+  btn.disabled = false;
+  btn.innerHTML = orig;
+  if (status === 503) {
+    toast('Online payment isn’t enabled yet — sending you to the enquiry form.', 'ok');
+    goEnquire(btn.dataset.name);
+  } else {
+    toast(data.error || 'Could not start checkout.', 'err');
+  }
+}
+
+function goEnquire(serviceName) {
+  const msg = $('#applyForm [name=message]');
+  if (msg) msg.value = `I'd like to book: ${serviceName}. Please get in touch about payment and scheduling.`;
+  document.querySelector('#apply').scrollIntoView({ behavior: 'smooth' });
+}
+
+function handlePaymentReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const pay = params.get('pay');
+  if (pay === 'success') toast('✅ Payment received — thank you! Check your email for a receipt.', 'ok');
+  else if (pay === 'cancel') toast('Checkout cancelled — no charge was made.', 'err');
+  if (pay) {
+    params.delete('pay');
+    params.delete('svc');
+    const qs = params.toString();
+    history.replaceState({}, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash);
+  }
 }
 
 /* ============================================================ forms */

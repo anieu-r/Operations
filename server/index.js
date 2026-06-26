@@ -32,6 +32,8 @@ import {
   validateRequest,
   checkEntitlements,
 } from './vevo.js';
+import { notifySubmission, isEmailConfigured } from './notify.js';
+import { publicConfig, createCheckoutSession, isStripeConfigured } from './payments-stripe.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = join(__dirname, '..', 'public');
@@ -143,6 +145,7 @@ app.post('/api/sop', (req, res) => {
   try {
     const saved = insert('sops', { purpose: input.purpose, visaCode: input.visaCode, fullName: input.fullName });
     reference = saved.reference;
+    notifySubmission('sop', saved).catch(() => {});
   } catch {
     /* non-fatal */
   }
@@ -169,6 +172,7 @@ app.post('/api/applications', (req, res) => {
     status: 'received',
   };
   const saved = insert('applications', record);
+  notifySubmission('application', saved).catch(() => {});
   res.status(201).json({
     ok: true,
     reference: saved.reference,
@@ -186,11 +190,21 @@ app.post('/api/contact', (req, res) => {
   if (!isEmail(email)) return bad(res, 'Please enter a valid email address.');
   if (!message) return bad(res, 'Please enter a message.');
   const saved = insert('contacts', { name, email, phone: str(b.phone, 40), message });
+  notifySubmission('contact', saved).catch(() => {});
   res.status(201).json({ ok: true, reference: saved.reference, message: 'Message received — we’ll reply by email.' });
 });
 
 app.get('/api/stats', (_req, res) => {
-  res.json({ ok: true, visaCount: visas.length, ...counts() });
+  res.json({
+    ok: true,
+    visaCount: visas.length,
+    ...counts(),
+    integrations: {
+      vevo: isLiveConfigured() ? 'live' : 'demo',
+      email: isEmailConfigured() ? 'on' : 'off',
+      payments: isStripeConfigured() ? 'on' : 'off',
+    },
+  });
 });
 
 // ---- VEVO: Visa Entitlement Verification (for organisations) -------------
@@ -229,6 +243,34 @@ app.post('/api/vevo/check', async (req, res) => {
   } catch (err) {
     console.error('VEVO check failed:', err);
     res.status(502).json({ ok: false, error: 'Unable to complete the entitlement check right now.' });
+  }
+});
+
+// ---- Stripe: AusWise service-fee payments (NOT government visa charges) ----
+app.get('/api/checkout/config', (_req, res) => {
+  res.json({ ok: true, ...publicConfig() });
+});
+
+app.post('/api/checkout/session', async (req, res) => {
+  const b = req.body || {};
+  const serviceId = str(b.serviceId, 40);
+  const email = str(b.email, 160);
+  if (email && !isEmail(email)) return bad(res, 'Please enter a valid email address.');
+  const baseUrl = `${req.protocol}://${req.get('host')}`;
+  try {
+    const session = await createCheckoutSession({ serviceId, email, baseUrl });
+    res.json({ ok: true, url: session.url });
+  } catch (err) {
+    if (err.code === 'NOT_CONFIGURED') {
+      return res.status(503).json({
+        ok: false,
+        code: 'NOT_CONFIGURED',
+        error: 'Online payment isn’t enabled yet. Please send a free enquiry and we’ll arrange it.',
+      });
+    }
+    if (err.code === 'UNKNOWN_SERVICE') return bad(res, 'Please choose a valid service.');
+    console.error('Stripe checkout failed:', err);
+    res.status(502).json({ ok: false, error: 'Could not start checkout. Please try again or send an enquiry.' });
   }
 });
 

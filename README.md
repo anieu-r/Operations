@@ -14,6 +14,8 @@ It bundles everything a migration business needs on the front door:
 | ✅ **VEVO entitlement check** | Implements the official **Home Affairs "(Visa) Entitlements"** API contract so organisations can verify a visa holder's work/study rights and conditions. |
 | 📰 **News & updates** | Source-linked summaries of significant immigration changes, plus deep-links to the Home Affairs newsroom for anything newer. |
 | 💳 **Fees & payments** | Explains how to pay **government charges directly to the official bodies** (ImmiAccount, BPAY, PayPal) — AusWise never collects government fees. Includes scam-safety guidance. |
+| 🤝 **Paid services (Stripe)** | Book consultations / assessments / reviews via **Stripe Checkout** — AusWise *service* fees only, kept strictly separate from government charges. |
+| ✉️ **Email notifications** | New enquiries, contact messages and SOP drafts are emailed to the business inbox (SMTP / Gmail). |
 | 🚀 **Enquiry + contact** | Lightweight intake forms persisted on the backend, each returning a reference number. |
 
 ## Tech
@@ -59,7 +61,9 @@ npm test
 | POST | `/api/contact` | Contact message |
 | GET | `/api/vevo/info` | VEVO mode + entitlement categories |
 | POST | `/api/vevo/check` | `{ data: {...} }` → entitlement result |
-| GET | `/api/stats` | Catalogue + submission counts |
+| GET | `/api/checkout/config` | Paid services + whether Stripe is enabled |
+| POST | `/api/checkout/session` | `{ serviceId, email }` → Stripe Checkout URL |
+| GET | `/api/stats` | Catalogue + submission counts + integration status |
 
 ## VEVO — Visa Entitlement Verification (for organisations)
 
@@ -77,6 +81,24 @@ shape (visa status, work/study conditions, Medicare eligibility, residence, etc.
   `https://api.public.homeaffairs.gov.au/visa/v1/entitlements/checks`.
 
 Copy `.env.example` to `.env` to configure.
+
+## Payments (Stripe) & email notifications
+
+Both follow the same "works in demo mode, goes live when you add credentials" pattern.
+
+**Stripe payments** — for AusWise's own *service* fees (consultations, assessments,
+reviews) via Stripe Checkout. **Government Visa Application Charges are never taken
+here** — they're paid directly to Home Affairs (see the Fees section). Set
+`STRIPE_SECRET_KEY` (`sk_test_…` or `sk_live_…`) to enable real checkout; without it
+the UI shows the services and invites a free enquiry instead. Prices use inline
+`price_data`, so no pre-created Stripe products are required.
+
+**Email notifications** — new enquiries, contact messages and SOP drafts are emailed
+to `NOTIFY_EMAIL`. Configure SMTP via `SMTP_URL` or `SMTP_HOST/PORT/USER/PASS`
+(Gmail works with an App Password). Without SMTP configured, submissions are logged
+to the console (and still saved). Email sending never blocks or fails a submission.
+
+See `.env.example` for all variables.
 
 ## Deploy
 
