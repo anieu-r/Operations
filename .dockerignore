@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log*
+.git
+.gitignore
+.github
+.env
+.env.*
+!.env.example
+server/data/db.json
+server/data/db.json.tmp
+*.log
+coverage
+dist
+README.md
+Dockerfile
+.dockerignore

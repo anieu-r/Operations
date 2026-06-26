@@ -1,0 +1,1312 @@
+{
+  "components": {
+    "headers": {
+      "tracestate": {
+        "schema": {
+          "pattern": "/^([a-z0-9][a-z0-9_\\-\\*\\@]{0,255}=([^,\\=]){1,256}([,]?|$))*$/",
+          "type": "string",
+          "example": "TESCAPP1=requestOrigin"
+        },
+        "description": "The value of a concatenation of trace graph key-value pairs. Conveys information about request position in multiple distributed tracing graphs. This header is a companion header for the `traceparent` header.",
+        "required": true
+      },
+      "X-RateLimit-Remaining": {
+        "schema": {
+          "type": "string",
+          "example": "name=rate-limit,4995;"
+        },
+        "description": "The number of remaining API invocations within the rate limit period.\n**Note:** Failed requests count towards your rate limit usage.\n"
+      },
+      "traceparent": {
+        "schema": {
+          "pattern": "/^00-[0-9a-f]{32}-[0-9a-f]{16}-0[0-1]$/",
+          "type": "string",
+          "example": "00-6E37A4F535BF4d67BEE5C05E4C741AFD-50563539444D2020-01"
+        },
+        "description": "Identifies the request in a tracing system, describing the position of the incoming request in its trace graph in a portable, fixed-length format.",
+        "required": true
+      },
+      "X-RateLimit-Limit": {
+        "schema": {
+          "type": "string",
+          "example": "name=rate-limit,5000;"
+        },
+        "description": "The client's Rate limit quota for this API.\nUnless otherwise specified, this is a *daily* limit.\n"
+      }
+    },
+    "schemas": {
+      "entitlementCategoryType": {
+        "description": "Specifies which Visa Entitlement category to check for the Visa Holders.\nMost organisations will only use a single entitlementCategory for all of their requests, however, some organisations are authorised to check more than one entitlement category.\n",
+        "type": "string",
+        "enum": [
+          "IMMIGRATION_STATUS",
+          "LEGAL_PRACTITIONER",
+          "LICENSING_ELIGIBILITY",
+          "MEDICARE_ELIGIBILITY",
+          "REGISTERED_MIGRATION_AGENT",
+          "RESIDENCE_STATUS",
+          "STUDY_ENTITLEMENTS",
+          "WORK_ENTITLEMENTS"
+        ]
+      },
+      "visaEntitlements": {
+        "description": "Visa Entitlements",
+        "type": "object",
+        "properties": {
+          "latestArrivalDate": {
+            "format": "date",
+            "description": "Last date Visa Holder can Arrive in Australia.",
+            "type": "string"
+          },
+          "visaHolderIsOnshore": {
+            "description": "Indicates whether the Visa Holder is currently Onshore",
+            "type": "boolean"
+          },
+          "visaClass": {
+            "description": "Visa Class Code",
+            "type": "string"
+          },
+          "applicantRole": {
+            "description": "Determines whether the visa holder was the primary or secondary Visa Applicant.",
+            "type": "string",
+            "enum": [
+              "PRIMARY",
+              "SECONDARY"
+            ]
+          },
+          "visaStatus": {
+            "description": "Current status of the Visa",
+            "type": "string"
+          },
+          "medicareEligibilityStatus": {
+            "description": "Medicare Eligibility status",
+            "type": "string",
+            "enum": [
+              "TEMPORARY_RESIDENT",
+              "PERMANENT_RESIDENT",
+              "NZ_CITIZEN",
+              "AUSTRALIAN_CITIZEN",
+              "RETIREE_VISA",
+              "MEDICAL_TREATMENT_VISA",
+              "STUDENT_VISA",
+              "CONTRIBUTORY_PARENT_VISA",
+              "BRIDGING_VISA"
+            ]
+          },
+          "familyName": {
+            "minLength": 1,
+            "description": "First Name or Given Name",
+            "type": "string",
+            "maxLength": 100
+          },
+          "educationSector": {
+            "description": "Describes the Education Sector this Visa Applies to",
+            "type": "string"
+          },
+          "mustNotArriveAfterDate": {
+            "format": "date",
+            "description": "Date after which the visa holder is unable to enter Australia",
+            "type": "string"
+          },
+          "enterBeforeDate": {
+            "format": "date",
+            "description": "Date before which the visa holder must enter Australia",
+            "type": "string"
+          },
+          "workConditions": {
+            "description": "list of work conditions",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/conditionType"
+            }
+          },
+          "residenceStatus": {
+            "description": "Determine's the Visa Holders residence status.\n\nOnly visible to: Educational Institutions, Commercial Organisations, Licensing Authorities, Australian Government Organisations\n",
+            "type": "string",
+            "enum": [
+              "TEMPORARY_RESIDENT",
+              "PERMANENT_RESIDENT",
+              "NZ_CITIZEN",
+              "AUSTRALIAN_CITIZEN"
+            ]
+          },
+          "visaConditions": {
+            "description": "list of Visa Conditions",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/conditionType"
+            }
+          },
+          "travelDocumentId": {
+            "minLength": 1,
+            "description": "Passport number",
+            "type": "string",
+            "maxLength": 14
+          },
+          "visaDescription": {
+            "description": "description of the Visa, only visible for Registered Migration agent and Legal Practitioner",
+            "type": "string"
+          },
+          "initialStayDate": {
+            "format": "date",
+            "description": "Date of initial stay in Australia",
+            "type": "string"
+          },
+          "ministerialInterventionCommencedDate": {
+            "format": "date",
+            "description": "Date when the Ministerial Intervention commenced.",
+            "type": "string"
+          },
+          "entitlementCategory": {
+            "$ref": "#/components/schemas/entitlementCategoryType"
+          },
+          "studyConditions": {
+            "description": "list of study conditions",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/conditionType"
+            }
+          },
+          "permanentResidentLodgementDate": {
+            "format": "date",
+            "description": "Permanent Resident Visa Application Lodgement Date.",
+            "type": "string"
+          },
+          "givenName": {
+            "minLength": 1,
+            "description": "Surname or Family Name",
+            "type": "string",
+            "maxLength": 100
+          },
+          "visaStream": {
+            "description": "Visa Stream",
+            "type": "string"
+          },
+          "entriesAllowed": {
+            "description": "The number of allowable entries into Australia",
+            "type": "string",
+            "enum": [
+              "M",
+              "1",
+              "0"
+            ]
+          },
+          "visaGrantNumber": {
+            "description": "Unique Visa Grant Number",
+            "type": "string"
+          },
+          "visaType": {
+            "description": "Visa Type",
+            "type": "string",
+            "enum": [
+              "AUSTRALIAN_CITIZEN",
+              "PERMANENT_RESIDENT",
+              "NZ_CITIZEN",
+              "TEMPORARY_RESIDENT",
+              "STUDENT_VISA",
+              "RETIREE_VISA",
+              "MEDICAL_TREATMENT_VISA",
+              "CONTRIBUTORY_PARENT_VISA",
+              "BRIDGING_VISA"
+            ]
+          },
+          "visaGrantDate": {
+            "format": "date",
+            "description": "Date the Visa was granted",
+            "type": "string"
+          },
+          "visaSubclass": {
+            "description": "Visa Sub class",
+            "type": "string"
+          },
+          "ministerialInterventionPending": {
+            "description": "Determines whether a Ministerial Intervention is pending for a decision regarding this Visa.",
+            "type": "boolean"
+          },
+          "periodOfStay": {
+            "description": "Period visa holder may stay in Australia\nIt is either a period expressed in months, years or the letter 'I' for indefinite.\n",
+            "type": "string"
+          },
+          "visaExpiryDate": {
+            "format": "date",
+            "description": "Date the Visa expires",
+            "type": "string"
+          },
+          "currentTimestamp": {
+            "format": "datetime",
+            "description": "Timestamp at which the Department of Home Affairs sent this response",
+            "type": "string",
+            "example": "2026-03-26T20:32:28Z"
+          },
+          "location": {
+            "description": "Determines whether the client is onshore or offshore.",
+            "type": "string",
+            "enum": [
+              "ONSHORE",
+              "OFFSHORE"
+            ]
+          },
+          "studyEntitlementStatus": {
+            "description": "Study Entitlement status",
+            "type": "string",
+            "enum": [
+              "NIL",
+              "LIMITED",
+              "UNLIMITED"
+            ]
+          },
+          "permanentResidentVisaApplicant": {
+            "description": "Indicates whether the Visa Holder is a Permanent Resident Visa Applicant.",
+            "type": "boolean"
+          },
+          "immigrationStatus": {
+            "description": "Immigration Status Type",
+            "type": "string",
+            "enum": [
+              "TEMPORARY_RESIDENT",
+              "PERMANENT_RESIDENT",
+              "NZ_CITIZEN",
+              "AUSTRALIAN_CITIZEN"
+            ]
+          },
+          "workEntitlementStatus": {
+            "description": "Work entitlement status",
+            "type": "string",
+            "enum": [
+              "NIL",
+              "LIMITED",
+              "UNLIMITED"
+            ]
+          }
+        }
+      },
+      "visaEntitlementResponse": {
+        "description": "Top level object wrapper for Visa Entitlement Responses",
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/visaEntitlements"
+          }
+        }
+      },
+      "conditionType": {
+        "description": "Condition details",
+        "type": "object",
+        "required": [
+          "currentTimestamp",
+          "conditionCode",
+          "conditionDescription"
+        ],
+        "properties": {
+          "conditionDescription": {
+            "minLength": 1,
+            "description": "Condition Description",
+            "type": "string",
+            "maxLength": 10000
+          },
+          "conditionCode": {
+            "minLength": 1,
+            "description": "Condition Code",
+            "type": "string",
+            "maxLength": 20
+          }
+        }
+      },
+      "visaEntitlementsRequest": {
+        "description": "The Personal Details of the Visa Holder.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "description": "Top level request wrapper.",
+            "type": "object",
+            "properties": {
+              "entitlementCategory": {
+                "$ref": "#/components/schemas/entitlementCategoryType"
+              },
+              "givenName": {
+                "minLength": 1,
+                "description": "First Name or Given Name",
+                "type": "string",
+                "maxLength": 100,
+                "example": "Skip"
+              },
+              "familyName": {
+                "minLength": 1,
+                "description": "Surname or Family Name",
+                "type": "string",
+                "maxLength": 100,
+                "example": "Intro"
+              },
+              "travelDocumentIssuingCountry": {
+                "pattern": "[A-Z]{3}",
+                "description": "Passport issuing country and it is 3 character ICAO Country Code",
+                "type": "string",
+                "example": "AUS"
+              },
+              "travelDocumentId": {
+                "minLength": 1,
+                "description": "Passport number",
+                "type": "string",
+                "maxLength": 14,
+                "example": "N6129182"
+              },
+              "birthDate": {
+                "format": "date",
+                "description": "Date of birth",
+                "type": "string",
+                "example": "1993-03-26"
+              }
+            },
+            "required": [
+              "birthDate",
+              "familyName",
+              "travelDocumentId",
+              "travelDocumentIssuingCountry"
+            ]
+          }
+        }
+      },
+      "errors": {
+        "description": "Container for all error related data",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "errors"
+        ],
+        "properties": {
+          "errors": {
+            "description": "A detailed error object",
+            "type": "array",
+            "items": {
+              "description": "standard error response structure as per jsonapi.org/format/#errors",
+              "type": "object",
+              "properties": {
+                "code": {
+                  "description": "A provider-specific or enterprise defined error code. Codes must be in uppercase.",
+                  "type": "string"
+                },
+                "detail": {
+                  "description": "A provider-specific or enterprise defined error message",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Unique identifier for the error occurrence, to provide traceability in application logs.\n",
+                  "type": "string"
+                },
+                "source": {
+                  "description": "An object containing references to the source of the error.",
+                  "type": "object",
+                  "properties": {
+                    "pointer": {
+                      "description": "A JSON pointer which describes which property in the request object the message relates to. For more details on JSON pointers see RFC6901:https://tools.ietf.org/html/rfc6901",
+                      "type": "string"
+                    },
+                    "parameter": {
+                      "description": "The parameter name which the message relates to. The message object should contain either the pointer or parameter property - not both.",
+                      "type": "string"
+                    },
+                    "location": {
+                      "description": "Describes the location of the data which the message is related to.",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "429-TooManyRequests": {
+        "headers": {
+          "tracestate": {
+            "$ref": "#/components/headers/tracestate"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/components/headers/X-RateLimit-Remaining"
+          },
+          "traceparent": {
+            "$ref": "#/components/headers/traceparent"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/components/headers/X-RateLimit-Limit"
+          }
+        },
+        "description": "Too Many Requests",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errors"
+            }
+          }
+        }
+      },
+      "403-Forbidden": {
+        "headers": {
+          "tracestate": {
+            "$ref": "#/components/headers/tracestate"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/components/headers/X-RateLimit-Remaining"
+          },
+          "traceparent": {
+            "$ref": "#/components/headers/traceparent"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/components/headers/X-RateLimit-Limit"
+          }
+        },
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errors"
+            }
+          }
+        }
+      },
+      "400-BadRequest": {
+        "headers": {
+          "tracestate": {
+            "$ref": "#/components/headers/tracestate"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/components/headers/X-RateLimit-Remaining"
+          },
+          "traceparent": {
+            "$ref": "#/components/headers/traceparent"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/components/headers/X-RateLimit-Limit"
+          }
+        },
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errors"
+            }
+          }
+        }
+      },
+      "401-Unauthorised": {
+        "headers": {
+          "tracestate": {
+            "$ref": "#/components/headers/tracestate"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/components/headers/X-RateLimit-Remaining"
+          },
+          "traceparent": {
+            "$ref": "#/components/headers/traceparent"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/components/headers/X-RateLimit-Limit"
+          }
+        },
+        "description": "Unauthorised",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errors"
+            }
+          }
+        }
+      },
+      "204-NoContent": {
+        "headers": {
+          "tracestate": {
+            "$ref": "#/components/headers/tracestate"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/components/headers/X-RateLimit-Remaining"
+          },
+          "traceparent": {
+            "$ref": "#/components/headers/traceparent"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/components/headers/X-RateLimit-Limit"
+          }
+        },
+        "description": "No Content"
+      },
+      "500-InternalServerError": {
+        "headers": {
+          "tracestate": {
+            "$ref": "#/components/headers/tracestate"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/components/headers/X-RateLimit-Remaining"
+          },
+          "traceparent": {
+            "$ref": "#/components/headers/traceparent"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/components/headers/X-RateLimit-Limit"
+          }
+        },
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errors"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-au-gov-homeaffairs-components": {
+      "enrolmentInfo": {
+        "processKey": "vevo"
+      },
+      "authorisation": {
+        "adminRoles": [
+          {
+            "sapRoleName": "ECAS_VEVO_ADMIN",
+            "name": "ECAS_VEVO_ADMIN",
+            "description": "ECAS_VEVO_ADMIN"
+          }
+        ],
+        "classes": [
+          {
+            "roles": [
+              "visa-work-entitlements"
+            ],
+            "name": "Work Entitlements",
+            "description": "Work Entitlements Access Class",
+            "id": "385ecd7e-961e-4a7a-95da-f35d7ca03458"
+          },
+          {
+            "roles": [
+              "visa-study-entitlements"
+            ],
+            "name": "Study Entitlements",
+            "description": "Study Entitlements Access Class",
+            "id": "252b61dd-55f5-4594-a044-fe7978b04f16"
+          },
+          {
+            "roles": [
+              "visa-licensing-eligibility"
+            ],
+            "name": "Licensing Eligibility",
+            "description": "Licensing Eligibility Access Class",
+            "id": "156faeb0-0648-44e6-b808-721c7d632943"
+          },
+          {
+            "roles": [
+              "visa-residence-status"
+            ],
+            "name": "Residence Status",
+            "description": "Residence Status Access Class",
+            "id": "38592cdb-abd1-4757-bbfc-c318568a619c"
+          },
+          {
+            "roles": [
+              "visa-immigration-status"
+            ],
+            "name": "Immigration Status",
+            "description": "Immigration Status Access Class",
+            "id": "0ee46f24-3531-4c43-9a90-2cc7229c341a"
+          },
+          {
+            "roles": [
+              "visa-medicare-eligibility"
+            ],
+            "name": "Medicare Eligibility",
+            "description": "Medicare Eligibility Access Class",
+            "id": "451e3fc1-05ee-4e8f-9de3-941ec792c0d2"
+          },
+          {
+            "roles": [
+              "visa-migration-agent"
+            ],
+            "name": "Migration Agent",
+            "description": "Migration Agent Access Class",
+            "id": "0d66fa04-00dc-487e-8a67-6e7c2f8a1a3e"
+          },
+          {
+            "roles": [
+              "visa-legal-practitioner"
+            ],
+            "name": "Legal Practitioner",
+            "description": "Legal Practitioner Access Class",
+            "id": "ca2b07f6-3483-465d-9f2b-0d5b65078773"
+          }
+        ],
+        "roles": [
+          {
+            "permissions": [
+              "VSA:ENT:R",
+              "VSA:ENT:E"
+            ],
+            "name": "visa-work-entitlements",
+            "description": "Users with access to Work Entitlements",
+            "id": "2a19c53d-6fa8-4402-945a-21a2fa4b95ff"
+          },
+          {
+            "permissions": [
+              "VSA:ENT:R",
+              "VSA:ENT:D"
+            ],
+            "name": "visa-study-entitlements",
+            "description": "Users with access to to Study Entitlements",
+            "id": "f49be5d4-174b-4616-a364-bf8b43e49804"
+          },
+          {
+            "permissions": [
+              "VSA:ENT:R",
+              "VSA:ENT:L"
+            ],
+            "name": "visa-licensing-eligibility",
+            "description": "Users with access to Licensing Eligibility",
+            "id": "2f39bb14-335d-4492-a2a5-c7393271b0c1"
+          },
+          {
+            "permissions": [
+              "VSA:ENT:R",
+              "VSA:ENT:C"
+            ],
+            "name": "visa-residence-status",
+            "description": "Users with access to Residence Status",
+            "id": "2af96d73-f350-435d-9aaa-e4c3c6769d49"
+          },
+          {
+            "permissions": [
+              "VSA:ENT:R",
+              "VSA:ENT:G"
+            ],
+            "name": "visa-immigration-status",
+            "description": "Users with access to Immigration Status",
+            "id": "8a4d34d4-325f-4cbf-87e6-9af2169e521c"
+          },
+          {
+            "permissions": [
+              "VSA:ENT:R",
+              "VSA:ENT:M"
+            ],
+            "name": "visa-medicare-eligibility",
+            "description": "Users with access to Medicare Eligibility",
+            "id": "fa158c86-e15e-4fcc-a5a7-97a62269b7ba"
+          },
+          {
+            "permissions": [
+              "VSA:ENT:R",
+              "VSA:ENT:I"
+            ],
+            "name": "visa-migration-agent",
+            "description": "Migration Agent role",
+            "id": "95073ef3-bd05-444e-9bbb-33bfdd386d49"
+          },
+          {
+            "permissions": [
+              "VSA:ENT:R",
+              "VSA:ENT:A"
+            ],
+            "name": "visa-legal-practitioner",
+            "description": "Legal Practitioner role",
+            "id": "99f10b1f-8f32-40e5-85d3-284698ff2fdd"
+          }
+        ],
+        "authorizationType": "internal"
+      }
+    },
+    "parameters": {
+      "tracestate": {
+        "schema": {
+          "pattern": "/^([a-z0-9][a-z0-9_\\-\\*\\@]{0,255}=([^,\\=]){1,256}([,]?|$))*$/",
+          "type": "string",
+          "example": "TESCAPP1=requestOrigin"
+        },
+        "in": "header",
+        "name": "tracestate",
+        "x-example": "TESCAPP1=requestOrigin",
+        "description": "The value of a concatenation of trace graph key-value pairs. Conveys information about request position in multiple distributed tracing graphs. This header is a companion header for the `traceparent` header.",
+        "required": true
+      },
+      "traceparent": {
+        "schema": {
+          "pattern": "/^00-[0-9a-f]{32}-[0-9a-f]{16}-0[0-1]$/",
+          "type": "string",
+          "example": "00-6E37A4F535BF4d67BEE5C05E4C741AFD-50563539444D2020-01"
+        },
+        "in": "header",
+        "name": "traceparent",
+        "x-example": "00-6E37A4F535BF4d67BEE5C05E4C741AFD-50563539444D2020-01",
+        "description": "Identifies the request in a tracing system, describing the position of the incoming request in its trace graph in a portable, fixed-length format.",
+        "required": true
+      }
+    },
+    "securitySchemes": {
+      "clientIdHeader": {
+        "type": "apiKey",
+        "name": "x-api-key",
+        "in": "header",
+        "x-key-type": "client_id"
+      },
+      "oauth2-entitlements": {
+        "x-ibm-oauth-provider": "e9-oauth-provider-public-visa",
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://mtls.epsts.homeaffairs.gov.au/securityservices/sps/oauth/oauth20/token",
+            "scopes": {
+              "VSA:ENT:R": "",
+              "VSA:ENT:E": "",
+              "VSA:ENT:D": "",
+              "VSA:ENT:L": "",
+              "VSA:ENT:C": "",
+              "VSA:ENT:G": "",
+              "VSA:ENT:M": "",
+              "VSA:ENT:I": "",
+              "VSA:ENT:A": ""
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.public.homeaffairs.gov.au/visa/v1/entitlements"
+    }
+  ],
+  "openapi": "3.0.1",
+  "paths": {
+    "/checks": {
+      "post": {
+        "summary": "Conduct a Visa Entitlement Check",
+        "requestBody": {
+          "description": "The details of the Visa Holder who's Visa Entitlements are to be checked.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/visaEntitlementsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "Conduct a Visa Entitlement Check for a specified Visa Holder.\n\nYour organisation may be authorised to see one or more categories of Visa Entitlement data.\nThese categories are nominated during enrolment and determine which scopes are present in your OAuth access tokens.\n\nBelow is a list Entitlement Categories and the corresponding scopes required to request that category.\n\n* IMMIGRATION_STATUS: VSA:ENT:R VSA:ENT:G\n* LEGAL_PRACTITIONER: VSA:ENT:R VSA:ENT:A\n* LICENSING_ELIGIBILITY: VSA:ENT:R VSA:ENT:L\n* MEDICARE_ELIGIBILITY: VSA:ENT:R VSA:ENT:M\n* REGISTERED_MIGRATION_AGENT: VSA:ENT:R VSA:ENT:I\n* RESIDENCE_STATUS: VSA:ENT:R VSA:ENT:C\n* STUDY_ENTITLEMENTS: VSA:ENT:R VSA:ENT:D\n* WORK_ENTITLEMENTS: VSA:ENT:R VSA:ENT:E\n\nRequests for categories for which you have not been authorised for will result in errors.\n\nAll authorised organisations have access to the following common fields:\n\nEach Entitlement Category returns additional data specific to that category.\nOrganisations authorised to access more than one Entitlement Category must make multiple requests to see all data.\n",
+        "operationId": "checkVisaEntitlements",
+        "responses": {
+          "200": {
+            "headers": {
+              "tracestate": {
+                "$ref": "#/components/headers/tracestate"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "traceparent": {
+                "$ref": "#/components/headers/traceparent"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              }
+            },
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/visaEntitlementResponse"
+                },
+                "examples": {
+                  "WORK_ENTITLEMENTS": {
+                    "summary": "WORK_ENTITLEMENTS",
+                    "value": {
+                      "data": {
+                        "entitlementCategory": "WORK_ENTITLEMENTS",
+                        "givenName": "Skip",
+                        "visaStream": "Tourist",
+                        "visaClass": "FA-600",
+                        "visaType": "AUSTRALIAN_CITIZEN",
+                        "visaGrantDate": "2025-10-25",
+                        "visaSubclass": "601",
+                        "applicantRole": "PRIMARY",
+                        "visaExpiryDate": "2025-10-28",
+                        "currentTimestamp": "2026-03-26T20:32:28Z",
+                        "familyName": "Intro",
+                        "workConditions": [
+                          {
+                            "conditionDescription": "NO_WORK",
+                            "conditionCode": "8101"
+                          },
+                          {
+                            "conditionDescription": "MAX_3_MONTHS_STUDY",
+                            "conditionCode": "8201"
+                          }
+                        ],
+                        "location": "ONSHORE",
+                        "travelDocumentId": "N6129182",
+                        "visaDescription": "RESIDENT",
+                        "workEntitlementStatus": "NIL"
+                      }
+                    }
+                  },
+                  "MEDICARE_ELIGIBILITY": {
+                    "summary": "MEDICARE_ELIGIBILITY",
+                    "value": {
+                      "data": {
+                        "entitlementCategory": "MEDICARE_ELIGIBILITY",
+                        "permanentResidentLodgementDate": "2025-09-09",
+                        "givenName": "Skip",
+                        "visaStream": "Tourist",
+                        "latestArrivalDate": "2025-10-25",
+                        "visaHolderIsOnshore": true,
+                        "visaClass": "FA-600",
+                        "visaType": "AUSTRALIAN_CITIZEN",
+                        "visaGrantDate": "2025-10-25",
+                        "visaSubclass": "601",
+                        "ministerialInterventionPending": false,
+                        "applicantRole": "PRIMARY",
+                        "visaExpiryDate": "2025-10-28",
+                        "medicareEligibilityStatus": "AUSTRALIAN_CITIZEN",
+                        "currentTimestamp": "2026-03-26T20:32:28Z",
+                        "familyName": "Intro",
+                        "workConditions": [
+                          {
+                            "conditionDescription": "NO_WORK",
+                            "conditionCode": "8101"
+                          },
+                          {
+                            "conditionDescription": "MAX_3_MONTHS_STUDY",
+                            "conditionCode": "8201"
+                          }
+                        ],
+                        "location": "ONSHORE",
+                        "travelDocumentId": "N6129182",
+                        "permanentResidentVisaApplicant": true,
+                        "visaDescription": "RESIDENT",
+                        "workEntitlementStatus": "NIL"
+                      }
+                    }
+                  },
+                  "STUDY_ENTITLEMENTS": {
+                    "summary": "STUDY_ENTITLEMENTS",
+                    "value": {
+                      "data": {
+                        "entitlementCategory": "STUDY_ENTITLEMENTS",
+                        "studyConditions": [
+                          {
+                            "conditionDescription": "MAX_3_MONTHS_STUDY",
+                            "conditionCode": "8201"
+                          }
+                        ],
+                        "givenName": "Skip",
+                        "visaStream": "Tourist",
+                        "visaClass": "FA-600",
+                        "visaType": "AUSTRALIAN_CITIZEN",
+                        "visaGrantDate": "2025-10-25",
+                        "visaSubclass": "601",
+                        "applicantRole": "PRIMARY",
+                        "visaExpiryDate": "2025-10-28",
+                        "currentTimestamp": "2026-03-26T20:32:28Z",
+                        "familyName": "Intro",
+                        "location": "ONSHORE",
+                        "residenceStatus": "AUSTRALIAN_CITIZEN",
+                        "studyEntitlementStatus": "LIMITED",
+                        "travelDocumentId": "N6129182",
+                        "visaDescription": "RESIDENT"
+                      }
+                    }
+                  },
+                  "REGISTERED_MIGRATION_AGENT": {
+                    "summary": "REGISTERED_MIGRATION_AGENT",
+                    "value": {
+                      "data": {
+                        "visaClass": "FA-600",
+                        "applicantRole": "PRIMARY",
+                        "visaStatus": "GRANTED",
+                        "familyName": "Intro",
+                        "enterBeforeDate": "2027-11-12",
+                        "visaConditions": [
+                          {
+                            "conditionDescription": "MAX_3_MONTHS_STUDY",
+                            "conditionCode": "8201"
+                          },
+                          {
+                            "conditionDescription": "NO_WORK",
+                            "conditionCode": "8101"
+                          },
+                          {
+                            "conditionDescription": "MAX_3_MONTHS_STUDY",
+                            "conditionCode": "8201"
+                          }
+                        ],
+                        "travelDocumentId": "N6129182",
+                        "visaDescription": "RESIDENT",
+                        "initialStayDate": "2027-11-01",
+                        "entitlementCategory": "REGISTERED_MIGRATION_AGENT",
+                        "givenName": "Skip",
+                        "visaStream": "Tourist",
+                        "entriesAllowed": "M",
+                        "visaGrantNumber": "2009561769152",
+                        "visaType": "AUSTRALIAN_CITIZEN",
+                        "visaGrantDate": "2025-10-25",
+                        "visaSubclass": "601",
+                        "ministerialInterventionPending": false,
+                        "periodOfStay": "M12",
+                        "visaExpiryDate": "2025-10-28",
+                        "currentTimestamp": "2026-03-26T20:32:28Z",
+                        "mustNotArriveAfter": "2027-11-01",
+                        "location": "ONSHORE",
+                        "studyEntitlementStatus": "LIMITED",
+                        "workEntitlementStatus": "NIL"
+                      }
+                    }
+                  },
+                  "LEGAL_PRACTITIONER": {
+                    "summary": "LEGAL_PRACTITIONER",
+                    "value": {
+                      "data": {
+                        "visaClass": "FA-600",
+                        "applicantRole": "PRIMARY",
+                        "visaStatus": "GRANTED",
+                        "familyName": "Intro",
+                        "enterBeforeDate": "2027-11-12",
+                        "visaConditions": [
+                          {
+                            "conditionDescription": "MAX_3_MONTHS_STUDY",
+                            "conditionCode": "8201"
+                          },
+                          {
+                            "conditionDescription": "NO_WORK",
+                            "conditionCode": "8101"
+                          },
+                          {
+                            "conditionDescription": "MAX_3_MONTHS_STUDY",
+                            "conditionCode": "8201"
+                          }
+                        ],
+                        "travelDocumentId": "N6129182",
+                        "visaDescription": "RESIDENT",
+                        "initialStayDate": "2027-11-01",
+                        "entitlementCategory": "LEGAL_PRACTITIONER",
+                        "givenName": "Skip",
+                        "visaStream": "Tourist",
+                        "entriesAllowed": "M",
+                        "visaGrantNumber": "2009561769152",
+                        "visaType": "AUSTRALIAN_CITIZEN",
+                        "visaGrantDate": "2025-10-25",
+                        "visaSubclass": "601",
+                        "ministerialInterventionPending": false,
+                        "periodOfStay": "M12",
+                        "visaExpiryDate": "2025-10-28",
+                        "currentTimestamp": "2026-03-26T20:32:28Z",
+                        "mustNotArriveAfter": "2027-12-01",
+                        "location": "ONSHORE",
+                        "studyEntitlementStatus": "LIMITED",
+                        "workEntitlementStatus": "NIL"
+                      }
+                    }
+                  },
+                  "LICENSING_ELIGIBILITY": {
+                    "summary": "LICENSING_ELIGIBILITY",
+                    "value": {
+                      "data": {
+                        "entitlementCategory": "LICENSING_ELIGIBILITY",
+                        "givenName": "Skip",
+                        "visaStream": "Tourist",
+                        "visaClass": "FA-600",
+                        "visaType": "AUSTRALIAN_CITIZEN",
+                        "visaGrantDate": "2025-10-25",
+                        "visaSubclass": "601",
+                        "applicantRole": "PRIMARY",
+                        "visaExpiryDate": "2025-10-28",
+                        "currentTimestamp": "2026-03-26T20:32:28Z",
+                        "familyName": "Intro",
+                        "workConditions": [
+                          {
+                            "conditionDescription": "NO_WORK",
+                            "conditionCode": "8101"
+                          },
+                          {
+                            "conditionDescription": "MAX_3_MONTHS_STUDY",
+                            "conditionCode": "8201"
+                          }
+                        ],
+                        "location": "ONSHORE",
+                        "residenceStatus": "AUSTRALIAN_CITIZEN",
+                        "travelDocumentId": "N6129182",
+                        "visaDescription": "RESIDENT",
+                        "workEntitlementStatus": "NIL"
+                      }
+                    }
+                  },
+                  "IMMIGRATION_STATUS": {
+                    "summary": "IMMIGRATION_STATUS",
+                    "value": {
+                      "data": {
+                        "entitlementCategory": "IMMIGRATION_STATUS",
+                        "givenName": "Skip",
+                        "visaStream": "Tourist",
+                        "visaClass": "FA-600",
+                        "visaType": "AUSTRALIAN_CITIZEN",
+                        "visaGrantDate": "2025-10-25",
+                        "visaSubclass": "601",
+                        "ministerialInterventionPending": false,
+                        "applicantRole": "PRIMARY",
+                        "visaExpiryDate": "2025-10-28",
+                        "currentTimestamp": "2026-03-26T20:32:28Z",
+                        "familyName": "Intro",
+                        "location": "ONSHORE",
+                        "travelDocumentId": "N6129182",
+                        "immigrationStatus": "AUSTRALIAN_CITIZEN",
+                        "visaDescription": "RESIDENT"
+                      }
+                    }
+                  },
+                  "RESIDENCE_STATUS": {
+                    "summary": "RESIDENCE_STATUS",
+                    "value": {
+                      "data": {
+                        "entitlementCategory": "RESIDENCE_STATUS",
+                        "givenName": "Skip",
+                        "visaStream": "Tourist",
+                        "visaClass": "FA-600",
+                        "visaType": "AUSTRALIAN_CITIZEN",
+                        "visaGrantDate": "2025-10-25",
+                        "visaSubclass": "601",
+                        "applicantRole": "PRIMARY",
+                        "visaExpiryDate": "2025-10-28",
+                        "currentTimestamp": "2026-03-26T20:32:28Z",
+                        "familyName": "Intro",
+                        "location": "ONSHORE",
+                        "residenceStatus": "AUSTRALIAN_CITIZEN",
+                        "travelDocumentId": "N6129182",
+                        "visaDescription": "RESIDENT"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400-BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/401-Unauthorised"
+          },
+          "403": {
+            "$ref": "#/components/responses/403-Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/429-TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/500-InternalServerError"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/traceparent"
+          },
+          {
+            "$ref": "#/components/parameters/tracestate"
+          }
+        ],
+        "tags": [
+          "entitlements"
+        ],
+        "security": [
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:E"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:D"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:L"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:C"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:G"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:M"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:I"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:A"
+            ],
+            "clientIdHeader": []
+          }
+        ]
+      }
+    },
+    "/": {
+      "head": {
+        "summary": "Verify system health",
+        "description": "This operation allows both consumers and the API provider to ensure the API is functioning end-to-end in any environment, including Production.\nThis operation is a no-op, i.e. no data is modified as a result of calling this API.\n\nFor Consumers:\nYou may call this operation to ensure your connectivity and API subscription are valid. Useful for PVT.\nNo data is modified as a result of calling this API.\n\nFor the API Provider:\nConsider this operation a health check.\nCalls to this operation must not alter data.\nAs a minimum this operation should be hardcoded to return a `200 OK` - This will allow consumers to verify their connectivity and API subscription, for example during PVT.\nOptionally, you may chose to use this operation to verify that your system and its dependencies (database, etc.) are accessible.\nAs a rule of thumb - do the work required for selecting 1 record from your database but don't return the result.\n",
+        "operationId": "verifyVisaEntitlements",
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204-NoContent"
+          },
+          "400": {
+            "$ref": "#/components/responses/400-BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/401-Unauthorised"
+          },
+          "429": {
+            "$ref": "#/components/responses/429-TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/500-InternalServerError"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/traceparent"
+          },
+          {
+            "$ref": "#/components/parameters/tracestate"
+          }
+        ],
+        "tags": [
+          "entitlements"
+        ],
+        "security": [
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:E"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:D"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:L"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:C"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:G"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:M"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:I"
+            ],
+            "clientIdHeader": []
+          },
+          {
+            "oauth2-entitlements": [
+              "VSA:ENT:R",
+              "VSA:ENT:A"
+            ],
+            "clientIdHeader": []
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "contact": {
+      "name": "VEVO Projects",
+      "email": "VEVO.Projects@homeaffairs.gov.au"
+    },
+    "description": "This API allows authorised Australian Organisations to perform a Entitlement check for a Visa Holder.\n\nThe API is a modernised version of [Visa Entitlement Verification Online (VEVO) for Organisations](https://immi.homeaffairs.gov.au/visas/already-have-a-visa/check-visa-details-and-conditions/check-conditions-online/for-organisations) Web Service.\n\n### Operations:\n\nThis API exposes the following operations:\n\n* `HEAD /visa/v1/entitlements` - Perform a system health check.\n* `POST /visa/v1/entitlements/checks` - Conduct a Visa Entitlement Checks\n\n### Authentication\n\nUsers of this API must be enrolled via the [Home Affairs Access Manager](https://am.homeaffairs.gov.au) and will be authorised to retrieve one or more categories of Visa Entitlement data.\nEach API Request **must** include the following HTTP Headers:\n\n* `Authorization`:\n  * set to `Bearer {access_token}`. \n  * Access Tokens are obtained from our OAuth 2.0 provider, details below.\n  * Tokens are valid for 8 hours and may be used multiple times in that timeframe.\n* `x-api-key`:\n  * Set this to the clientId generated during Home Affairs Access Manager machine certificate registration.\n\n### Error Handling\n\n* This API returns appropriate HTTP status codes and error responses for a range of failure scenarios.\n* If you encounter an undocumented exception please get in touch with the Department using the contact details below.\n\n\n### Rate Limiting\n\n* Rate limiting is applied and enforced to prevent excessive use or abuse of Departmental systems.\n* A `429` Status Code is returned if the rate limit is exceeded. \n* You may check your remaining request allowance by checking the `X-RateLimit-Limit` response header.\n\n### Logging and Auditing\n\n* All API requests and operations are logged for auditing and monitoring purposes.\n",
+    "title": "(Visa) Entitlements",
+    "version": "1.0.34",
+    "x-ibm-name": "visa-entitlements"
+  },
+  "tags": [
+    {
+      "name": "entitlements",
+      "description": "Visa Entitlement operations"
+    }
+  ],
+  "x-ibm-configuration": {
+    "enforced": true,
+    "phase": "realized",
+    "testable": false,
+    "cors": {
+      "enabled": true
+    },
+    "oauth-servers": {
+      "oauth2-entitlements": {
+        "clientCredentials": {
+          "tokenUrls": [
+            "https://mtls.epsts.homeaffairs.gov.au/securityservices/sps/oauth/oauth20/token"
+          ],
+          "authorizationUrls": [],
+          "refreshUrls": []
+        }
+      }
+    }
+  },
+  "x-ibm-endpoints": [
+    {
+      "url": "https://api.public.homeaffairs.gov.au/visa/v1/entitlements"
+    }
+  ]
+}

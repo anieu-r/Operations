@@ -1,0 +1,21 @@
+# One-click deploy to Render (https://render.com) — Infrastructure as Code.
+# In Render: New + → Blueprint → connect this repo. Or deploy the Dockerfile
+# directly as a Web Service. The app binds to $PORT automatically.
+services:
+  - type: web
+    name: auswise-migration
+    runtime: node
+    plan: free
+    branch: claude/australia-visa-migration-site-uqkcw1
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Optional — set these to enable LIVE VEVO checks (org enrolment required).
+      - key: VEVO_ACCESS_TOKEN
+        sync: false
+      - key: VEVO_CLIENT_ID
+        sync: false
