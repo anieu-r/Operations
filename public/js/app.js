@@ -190,8 +190,9 @@ async function openVisaModal(code) {
     <div class="m-section"><p><b>Work rights:</b> ${esc(v.workRights)}</p></div>
     <p class="m-note">⚠️ Fees and rules change (often on 1 July). Always confirm the current charge and criteria on the official Home Affairs page before lodging.</p>
     <div class="m-cta">
-      <a class="btn btn-primary" href="${esc(v.officialUrl)}" target="_blank" rel="noopener">View on Home Affairs ↗</a>
-      <a class="btn btn-ghost" href="#apply" data-close>Enquire about this visa</a>
+      <a class="btn btn-primary" href="/apply.html?visa=${encodeURIComponent(v.code)}">🚀 Start my application — free</a>
+      <a class="btn btn-ghost" href="${esc(v.officialUrl)}" target="_blank" rel="noopener">View on Home Affairs ↗</a>
+      <a class="btn btn-ghost" href="#apply" data-close>Ask a question first</a>
     </div>`;
   $$('[data-close]', $('#modalBody')).forEach((el) => el.addEventListener('click', closeModal));
   $('#visaModal').hidden = false;
@@ -259,7 +260,7 @@ async function submitFinder() {
           ${r.why?.length ? `<div class="why">Why: ${esc(r.why.join(' · '))}</div>` : ''}
           <div class="rec-actions">
             <button class="btn btn-ghost rec-open" data-code="${esc(r.code)}">See full guide</button>
-            <a class="btn btn-primary" href="#apply">Enquire</a>
+            <a class="btn btn-primary" href="/apply.html?visa=${encodeURIComponent(r.code)}">Start application — free</a>
           </div>
         </div>
       </div>`
@@ -292,6 +293,35 @@ function initSOP() {
   purpose.addEventListener('change', sync);
   sync();
 
+  // Restore autosaved fields so nothing is lost on refresh.
+  try {
+    const saved = JSON.parse(localStorage.getItem('auswise-sop') || '{}');
+    Object.entries(saved).forEach(([k, v]) => {
+      if (form.elements[k]) form.elements[k].value = v;
+    });
+    if (saved.purpose) sync();
+  } catch {
+    /* ignore */
+  }
+
+  // Live preview: regenerate (without saving) as the user types, debounced.
+  let previewTimer = null;
+  const schedulePreview = () => {
+    const payload = Object.fromEntries(new FormData(form).entries());
+    localStorage.setItem('auswise-sop', JSON.stringify(payload));
+    if (!payload.fullName) return; // preview needs at least a name
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(async () => {
+      const { ok, data } = await api('/sop', {
+        method: 'POST',
+        body: JSON.stringify({ ...payload, preview: true }),
+      });
+      if (ok) renderSOP(data, payload.fullName, true);
+    }, 650);
+  };
+  form.addEventListener('input', schedulePreview);
+  form.addEventListener('change', schedulePreview);
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = Object.fromEntries(new FormData(form).entries());
@@ -307,10 +337,14 @@ function initSOP() {
     $('#sopOutput').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 }
-function renderSOP(data, name) {
+function renderSOP(data, name, isPreview = false) {
   const out = $('#sopOutput');
   out.innerHTML = `
     <div class="sop-result">
+      <div class="sop-live">
+        <span>${isPreview ? '<span class="pulse"></span>Live preview — updates as you type' : '✅ Final draft generated'}</span>
+        <span class="wc">${data.wordCount || 0} words</span>
+      </div>
       <h3>Your SOP draft ${data.reference ? `<span class="muted">· ${esc(data.reference)}</span>` : ''}</h3>
       <p class="fineprint">Target length: ${esc(data.wordCountTarget)}. Edit it to sound like you — and keep every claim true.</p>
       <div class="sop-draft" id="sopDraft">${esc(data.draft)}</div>
@@ -478,12 +512,14 @@ async function loadServices() {
   if (!grid) return;
   const { data } = await api('/checkout/config');
   const enabled = data.enabled;
+  const freeList = $('#freeList');
+  if (freeList) freeList.innerHTML = (data.freeFeatures || []).map((f) => `<li>${esc(f)}</li>`).join('');
   const banner = $('#payBanner');
   if (banner) {
     banner.hidden = false;
     banner.innerHTML = enabled
-      ? '🔒 <b>Secure checkout by Stripe.</b> Pay by card; you’ll get a receipt by email.'
-      : '💬 <b>Online payment isn’t switched on yet.</b> Pick a service and send a free enquiry — we’ll arrange payment with you directly.';
+      ? '🔒 <b>The two optional extras below</b> use secure Stripe checkout. Everything above is free — no card needed.'
+      : '💬 <b>Online payment isn’t switched on yet.</b> The extras below are optional anyway — send a free enquiry and we’ll arrange it if you want one.';
     banner.classList.toggle('on', !!enabled);
   }
   $('#payFootnote').textContent = data.note || '';

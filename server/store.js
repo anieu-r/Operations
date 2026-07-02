@@ -22,7 +22,17 @@ const DATA_DIR = process.env.DATA_DIR
   : join(__dirname, 'data');
 const DB_PATH = join(DATA_DIR, 'db.json');
 
-const EMPTY = () => ({ applications: [], sops: [], contacts: [], eligibility: [] });
+const EMPTY = () => ({
+  applications: [],
+  sops: [],
+  contacts: [],
+  eligibility: [],
+  agents: [],
+  reviews: [],
+  sessions: [],
+  questionnaireResponses: [],
+  institutionLeads: [],
+});
 
 let persistEnabled = true; // flips to false on first write failure
 let memory = load();
@@ -77,12 +87,48 @@ export function counts() {
     sops: memory.sops.length,
     contacts: memory.contacts.length,
     eligibilityChecks: memory.eligibility.length,
+    agents: memory.agents.length,
+    reviews: memory.reviews.length,
+    questionnaires: memory.questionnaireResponses.length,
   };
+}
+
+/** Update the first record matching `where` with `patch`. Returns the updated row or null. */
+export function update(collection, where, patch) {
+  const rows = memory[collection] || [];
+  const row = rows.find((r) => Object.entries(where).every(([k, v]) => r[k] === v));
+  if (!row) return null;
+  Object.assign(row, patch, { updatedAt: new Date().toISOString() });
+  persist();
+  return row;
+}
+
+export function findOne(collection, where) {
+  return (memory[collection] || []).find((r) => Object.entries(where).every(([k, v]) => r[k] === v)) || null;
+}
+
+export function removeWhere(collection, where) {
+  const rows = memory[collection] || [];
+  const keep = rows.filter((r) => !Object.entries(where).every(([k, v]) => r[k] === v));
+  const removed = rows.length - keep.length;
+  memory[collection] = keep;
+  if (removed) persist();
+  return removed;
 }
 
 function makeReference(collection) {
   const prefix =
-    { applications: 'APP', sops: 'SOP', contacts: 'MSG', eligibility: 'ELG' }[collection] || 'REF';
+    {
+      applications: 'APP',
+      sops: 'SOP',
+      contacts: 'MSG',
+      eligibility: 'ELG',
+      agents: 'AGT',
+      reviews: 'REV',
+      sessions: 'SES',
+      questionnaireResponses: 'QNR',
+      institutionLeads: 'INS',
+    }[collection] || 'REF';
   const stamp = Date.now().toString(36).toUpperCase().slice(-5);
   const rand = Math.random().toString(36).toUpperCase().slice(2, 5);
   return `${prefix}-${stamp}${rand}`;

@@ -14,8 +14,11 @@ It bundles everything a migration business needs on the front door:
 | ✅ **VEVO entitlement check** | Implements the official **Home Affairs "(Visa) Entitlements"** API contract so organisations can verify a visa holder's work/study rights and conditions. |
 | 📰 **News & updates** | Source-linked summaries of significant immigration changes, plus deep-links to the Home Affairs newsroom for anything newer. |
 | 💳 **Fees & payments** | Explains how to pay **government charges directly to the official bodies** (ImmiAccount, BPAY, PayPal) — AusWise never collects government fees. Includes scam-safety guidance. |
-| 🤝 **Paid services (Stripe)** | Book consultations / assessments / reviews via **Stripe Checkout** — AusWise *service* fees only, kept strictly separate from government charges. |
-| ✉️ **Email notifications** | New enquiries, contact messages and SOP drafts are emailed to the business inbox (SMTP / Gmail). |
+| 💚 **Free platform** | Everything is free. Exactly **two** optional paid extras (expert SOP review, one-on-one session) via Stripe Checkout — nothing else, ever. |
+| 📋 **Application questionnaires** | A professional-grade intake questionnaire tailored to every visa type (`/apply.html`), with autosave/resume, conditional fields and honest next-steps. |
+| 🧑‍💼 **MARN agent directory** | Agents register (free), log in (scrypt + bearer tokens) and manage a public profile; clients rate and review them (`/agents.html`). MARNs are format-checked with OMARA verify links everywhere; example profiles clearly flagged. |
+| 🏛️ **Institutions window** | Factual, commission-free directory of Australian universities & TAFEs with CRICOS links, plus a partner registration window for institutions (`/institutions.html`). |
+| ✉️ **Email notifications** | New enquiries, questionnaires, contact messages and SOP drafts are emailed to the business inbox (SMTP / Gmail). |
 | 🚀 **Enquiry + contact** | Lightweight intake forms persisted on the backend, each returning a reference number. |
 
 ## Tech
@@ -61,8 +64,17 @@ npm test
 | POST | `/api/contact` | Contact message |
 | GET | `/api/vevo/info` | VEVO mode + entitlement categories |
 | POST | `/api/vevo/check` | `{ data: {...} }` → entitlement result |
-| GET | `/api/checkout/config` | Paid services + whether Stripe is enabled |
+| GET | `/api/checkout/config` | Free features + the two paid extras + Stripe status |
 | POST | `/api/checkout/session` | `{ serviceId, email }` → Stripe Checkout URL |
+| GET | `/api/agents` | Agent directory (ratings, filters) |
+| GET/PATCH | `/api/agents/me` | Logged-in agent profile (Bearer token) |
+| POST | `/api/agents/register` / `login` / `logout` | Agent accounts (scrypt-hashed passwords) |
+| GET | `/api/agents/:id` | Agent profile + reviews |
+| POST | `/api/agents/:id/reviews` | `{ rating 1–5, name, comment }` |
+| GET | `/api/questionnaires/:visaCode` | Tailored application questionnaire |
+| POST | `/api/questionnaires` | `{ visaCode, answers }` → saved with reference |
+| GET | `/api/institutions?state=&type=&q=` | Universities & TAFE directory |
+| POST | `/api/institutions/enquiry` | Institution partner registration |
 | GET | `/api/stats` | Catalogue + submission counts + integration status |
 
 ## VEVO — Visa Entitlement Verification (for organisations)

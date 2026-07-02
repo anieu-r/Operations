@@ -21,34 +21,43 @@
 
 const CURRENCY = (process.env.STRIPE_CURRENCY || 'aud').toLowerCase();
 
-/** Catalogue of paid services. Amounts are in the smallest currency unit (cents). */
+/**
+ * Catalogue of paid services. Amounts are in the smallest currency unit (cents).
+ *
+ * PRICING POLICY: the platform is free. Everything — visa guides, the finder,
+ * the questionnaire, the SOP builder, VEVO checks, news, the agent directory —
+ * costs nothing. Money changes hands ONLY for these two optional extras.
+ */
 export const SERVICES = [
   {
-    id: 'consult-30',
-    name: '30-minute migration consultation',
-    description: 'One-on-one video/phone session to map your best visa pathway and next steps.',
+    id: 'sop-review',
+    name: 'Expert SOP review',
+    description:
+      'A professional reviews and polishes the SOP you built here (free) — structure, evidence, tone and the questions decision-makers actually ask.',
+    amount: 7900,
+    popular: true,
+  },
+  {
+    id: 'consult-1on1',
+    name: 'One-on-one detailed session',
+    description:
+      'A private video/phone session to go deep on your situation: pathway strategy, points, timing, risks and a step-by-step plan.',
     amount: 9900,
     popular: true,
   },
-  {
-    id: 'assessment',
-    name: 'Full eligibility assessment',
-    description: 'Detailed written assessment of your options, points estimate and a tailored document checklist.',
-    amount: 24900,
-    popular: true,
-  },
-  {
-    id: 'app-review',
-    name: 'Application & document review',
-    description: 'We review your prepared application and documents before you lodge, with written feedback.',
-    amount: 19900,
-  },
-  {
-    id: 'sop-review',
-    name: 'SOP / Statement of Purpose review',
-    description: 'Expert review and polish of your Statement of Purpose or Genuine Student statement.',
-    amount: 7900,
-  },
+];
+
+/** What the platform includes at no charge — shown alongside the paid extras. */
+export const FREE_FEATURES = [
+  'Every visa guide, requirement list and document checklist',
+  'The 30-second visa finder',
+  'The full application questionnaire for every visa type',
+  'The SOP builder with live preview (build unlimited drafts)',
+  'VEVO visa-conditions checks',
+  'Immigration news and official links',
+  'The MARN agent directory, ratings and reviews',
+  'The education institutions directory',
+  'Enquiries and email support',
 ];
 
 export function isStripeConfigured() {
@@ -59,6 +68,8 @@ export function publicConfig() {
   return {
     enabled: isStripeConfigured(),
     currency: CURRENCY.toUpperCase(),
+    freePlatform: true,
+    freeFeatures: FREE_FEATURES,
     services: SERVICES.map((s) => ({
       id: s.id,
       name: s.name,
@@ -68,8 +79,8 @@ export function publicConfig() {
       popular: Boolean(s.popular),
     })),
     note: isStripeConfigured()
-      ? 'Secure checkout by Stripe. These are AusWise service fees only — government visa charges are paid separately, directly to Home Affairs.'
-      : 'Online payment isn’t switched on for this deployment yet. You can still send a free enquiry and we’ll arrange payment. (Set STRIPE_SECRET_KEY to enable Stripe Checkout.)',
+      ? 'The platform is free. These two optional extras are the only things we charge for — secure checkout by Stripe. Government visa charges are always paid separately, directly to Home Affairs.'
+      : 'The platform is free. The two optional extras aren’t payable online in this deployment yet — send a free enquiry and we’ll arrange it. (Set STRIPE_SECRET_KEY to enable Stripe Checkout.)',
   };
 }
 

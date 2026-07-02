@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registered Migration Agents — AusWise Migration</title>
+  <meta name="description" content="Find, review and rate MARN registered migration agents. Free directory — always verify agents on the official OMARA register." />
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="bg-decor" aria-hidden="true">
+    <span class="blob blob-1"></span><span class="blob blob-2"></span>
+    <span class="float-icon fi-2">🧑‍💼</span><span class="float-icon fi-4">⭐</span>
+  </div>
+
+  <header class="nav">
+    <a class="brand" href="/"><img class="brand-mark" src="/assets/logo.svg" alt="AusWise logo" width="36" height="36" /><span class="brand-name">Aus<span>Wise</span> Migration</span></a>
+    <nav class="nav-links">
+      <a href="/">Home</a>
+      <a href="/#visas">Visas</a>
+      <a href="/apply.html">Start application</a>
+      <a href="/institutions.html">Institutions</a>
+      <a href="#agent-login" class="nav-cta">Agent login</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Open menu">☰</button>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <span class="free-pill">✅ Free directory · free reviews · no commissions</span>
+      <h1>🧑‍💼 Registered migration agents</h1>
+      <p>Find a MARN agent, read real client reviews, and leave your own. Honesty first: MARNs here are format-checked, not auto-verified — <strong>always confirm an agent on the official OMARA register</strong> before engaging them.</p>
+      <a class="btn btn-ghost" id="omaraBtn" target="_blank" rel="noopener">Verify any agent on the OMARA register ↗</a>
+    </div>
+
+    <!-- DIRECTORY -->
+    <section class="section" id="directory">
+      <div class="filters">
+        <input id="agentSearch" class="search" type="search" placeholder="Search name, city, language, MARN…" />
+      </div>
+      <div class="chips" id="specialtyChips"></div>
+      <p class="muted" id="agentNotice"></p>
+      <div class="agent-grid" id="agentGrid"></div>
+      <p class="muted center" id="agentEmpty" hidden>No agents match that search.</p>
+    </section>
+
+    <!-- AGENT LOGIN / DASHBOARD -->
+    <section class="section" id="agent-login">
+      <div class="section-head">
+        <h2>🔐 Agent portal</h2>
+        <p>MARN agents: create a free listing, manage your profile, and see your reviews. Listing is and stays free.</p>
+      </div>
+
+      <div id="authArea" class="auth-wrap">
+        <form class="glass" id="authForm" style="padding: clamp(1.3rem,3vw,1.9rem)">
+          <div class="auth-tabs">
+            <button type="button" class="active" data-mode="login">Log in</button>
+            <button type="button" data-mode="register">Register</button>
+          </div>
+          <div data-only="register">
+            <label>Full name *<input name="name" placeholder="As on the OMARA register" /></label>
+            <label>MARN (7 digits) *<input name="marn" maxlength="7" placeholder="e.g. 1234567" /></label>
+          </div>
+          <label>Email *<input name="email" type="email" required placeholder="you@agency.com" /></label>
+          <label>Password *<input name="password" type="password" required minlength="8" placeholder="8+ characters" /></label>
+          <div data-only="register">
+            <label>Location<input name="location" placeholder="e.g. Melbourne, VIC" /></label>
+            <label>Short bio<textarea name="bio" rows="2" placeholder="Experience, focus areas, languages…"></textarea></label>
+            <label>Specialties<select name="specialties" id="specialtySelect" multiple size="4"></select>
+              <span class="fineprint">Hold Ctrl/Cmd to select several.</span></label>
+            <label>Languages (comma separated)<input name="languages" placeholder="English, Hindi, Mandarin" /></label>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit" id="authSubmit">Log in</button>
+          <p class="fineprint">Passwords are stored hashed (scrypt). We list your name, MARN, bio and reviews publicly — never your email. New profiles appear immediately and honestly carry a “verify on OMARA” link like everyone else.</p>
+        </form>
+
+        <aside class="glass" style="padding: clamp(1.3rem,3vw,1.9rem)">
+          <h3>Why list here?</h3>
+          <ol class="steps">
+            <li><b>Free forever</b> — no listing fees, no commissions, no pay-to-rank.</li>
+            <li><b>Real reviews</b> — clients rate you directly; we don’t edit or reorder them for money.</li>
+            <li><b>Qualified leads</b> — applicants arrive with a completed questionnaire and clear needs.</li>
+          </ol>
+          <div class="divider"></div>
+          <p class="fineprint">We show reviews as submitted (marked “unverified”) and flag example profiles clearly. We remove only unlawful content. That’s the deal — transparency both ways.</p>
+        </aside>
+      </div>
+
+      <div id="dashArea" hidden>
+        <div class="glass" style="padding: clamp(1.3rem,3vw,1.9rem)">
+          <div class="dash-head">
+            <h3 id="dashName">—</h3>
+            <button class="btn btn-ghost" id="logoutBtn">Log out</button>
+          </div>
+          <form id="profileForm">
+            <div class="grid-2">
+              <label>Location<input name="location" /></label>
+              <label>Languages (comma separated)<input name="languages" /></label>
+            </div>
+            <label>Bio<textarea name="bio" rows="3"></textarea></label>
+            <label>Specialties<select name="specialties" id="dashSpecialties" multiple size="4"></select></label>
+            <button class="btn btn-primary" type="submit">Save profile</button>
+          </form>
+          <div class="divider"></div>
+          <h4>Your reviews</h4>
+          <div id="dashReviews" class="muted">—</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="disclaimer">
+      <p><strong>Transparency:</strong> AusWise verifies MARN <em>format</em> only. Registration status, sanctions and conditions must be checked on the official <a href="https://www.mara.gov.au/" target="_blank" rel="noopener">OMARA register</a>. Reviews are user-submitted and unverified. Example profiles are fictional and labelled. Only registered migration agents and Australian legal practitioners may lawfully provide immigration assistance for a fee.</p>
+      <p class="muted">© <span id="year"></span> AusWise Migration.</p>
+    </div>
+  </footer>
+
+  <div class="modal" id="agentModal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card glass" role="dialog" aria-modal="true">
+      <button class="modal-close" data-close aria-label="Close">✕</button>
+      <div id="agentModalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+  <script src="/js/agents.js" type="module"></script>
+</body>
+</html>

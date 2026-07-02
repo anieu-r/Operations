@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Start your application — AusWise Migration</title>
+  <meta name="description" content="Start your Australian visa application with a free, professional-grade questionnaire tailored to your visa type." />
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="bg-decor" aria-hidden="true">
+    <span class="blob blob-1"></span><span class="blob blob-3"></span>
+    <span class="float-icon fi-2">📋</span><span class="float-icon fi-4">🛂</span>
+  </div>
+
+  <header class="nav">
+    <a class="brand" href="/"><img class="brand-mark" src="/assets/logo.svg" alt="AusWise logo" width="36" height="36" /><span class="brand-name">Aus<span>Wise</span> Migration</span></a>
+    <nav class="nav-links">
+      <a href="/">Home</a>
+      <a href="/#visas">Visas</a>
+      <a href="/agents.html">Agents</a>
+      <a href="/institutions.html">Institutions</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Open menu">☰</button>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <span class="free-pill">✅ 100% free — no charge to start, complete or submit</span>
+      <h1>📋 Start your application</h1>
+      <p>The same intake questionnaire a professional consultancy uses — tailored to your visa. Your answers stay with us (never sent to the government) and set up honest, specific advice.</p>
+    </div>
+
+    <section class="section">
+      <!-- STEP 0: pick visa -->
+      <div class="glass wizard" id="pickVisa">
+        <div class="wiz-section-title">🛂 Which visa are you applying for?</div>
+        <label>Choose your visa
+          <select id="visaSelect"><option value="">Loading…</option></select>
+        </label>
+        <p class="fineprint">Not sure which visa? Use the <a href="/#finder">30-second visa finder</a> first — it’s free.</p>
+        <div class="wiz-nav"><span></span><button class="btn btn-primary btn-lg" id="startBtn" disabled>Start questionnaire →</button></div>
+      </div>
+
+      <!-- WIZARD -->
+      <div class="glass wizard" id="wizard" hidden>
+        <div class="finder-progress"><span id="wizBar"></span></div>
+        <div id="wizBody"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="disclaimer">
+      <p><strong>Honesty protects you:</strong> declare refusals, gaps and health/character matters up front — non-disclosure is one of the most common reasons applications fail. We give you the same advice whether it’s good news or not. This questionnaire is not a government form and is never lodged with the Department of Home Affairs.</p>
+      <p class="muted">© <span id="year"></span> AusWise Migration.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" hidden></div>
+  <script src="/js/apply.js" type="module"></script>
+</body>
+</html>
