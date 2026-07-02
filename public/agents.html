@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registered Migration Agents — AusWise Migration</title>
   <meta name="description" content="Find, review and rate MARN registered migration agents. Free directory — always verify agents on the official OMARA register." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;450;500;550;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
   <div class="bg-decor" aria-hidden="true">
     <span class="blob blob-1"></span><span class="blob blob-2"></span>
-    <span class="float-icon fi-2">🧑‍💼</span><span class="float-icon fi-4">⭐</span>
+    <span class="float-icon fi-2"></span><span class="float-icon fi-4"></span>
   </div>
 
   <header class="nav">
@@ -28,8 +31,8 @@
 
   <main>
     <div class="page-hero">
-      <span class="free-pill">✅ Free directory · free reviews · no commissions</span>
-      <h1>🧑‍💼 Registered migration agents</h1>
+      <span class="free-pill">Free directory · free reviews · no commissions</span>
+      <h1>Registered migration agents</h1>
       <p>Find a MARN agent, read real client reviews, and leave your own. Honesty first: MARNs here are format-checked, not auto-verified — <strong>always confirm an agent on the official OMARA register</strong> before engaging them.</p>
       <a class="btn btn-ghost" id="omaraBtn" target="_blank" rel="noopener">Verify any agent on the OMARA register ↗</a>
     </div>
@@ -48,7 +51,8 @@
     <!-- AGENT LOGIN / DASHBOARD -->
     <section class="section" id="agent-login">
       <div class="section-head">
-        <h2>🔐 Agent portal</h2>
+        <span class="eyebrow">Agent portal</span>
+        <h2>Your practice, listed free</h2>
         <p>MARN agents: create a free listing, manage your profile, and see your reviews. Listing is and stays free.</p>
       </div>
 
@@ -78,6 +82,7 @@
         <aside class="glass" style="padding: clamp(1.3rem,3vw,1.9rem)">
           <h3>Why list here?</h3>
           <ol class="steps">
+            <li><b>Earn A$99 per client</b> — every one-on-one session booked with you pays the full A$99 to your bank account. We keep nothing.</li>
             <li><b>Free forever</b> — no listing fees, no commissions, no pay-to-rank.</li>
             <li><b>Real reviews</b> — clients rate you directly; we don’t edit or reorder them for money.</li>
             <li><b>Qualified leads</b> — applicants arrive with a completed questionnaire and clear needs.</li>
@@ -101,6 +106,19 @@
             <label>Bio<textarea name="bio" rows="3"></textarea></label>
             <label>Specialties<select name="specialties" id="dashSpecialties" multiple size="4"></select></label>
             <button class="btn btn-primary" type="submit">Save profile</button>
+          </form>
+          <div class="divider"></div>
+          <h4>Payouts — <span id="payoutAmount">A$99</span> per client</h4>
+          <p class="muted" id="payoutBlurb" style="font-size:.9rem"></p>
+          <p id="payoutStatus" class="fineprint"></p>
+          <form id="payoutForm">
+            <label>Account holder name<input name="accountName" required placeholder="As it appears on your bank account" /></label>
+            <div class="grid-2">
+              <label>BSB<input name="bsb" required placeholder="e.g. 062-000" maxlength="7" /></label>
+              <label>Account number<input name="accountNumber" required placeholder="5–10 digits" maxlength="10" /></label>
+            </div>
+            <button class="btn btn-primary" type="submit">Save payout details</button>
+            <p class="fineprint">Stored privately on the server and shown only to you, masked. Never displayed on your public profile. For a production deployment, connect a payment provider (e.g. Stripe Connect) — see the README.</p>
           </form>
           <div class="divider"></div>
           <h4>Your reviews</h4>

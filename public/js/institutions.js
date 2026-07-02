@@ -81,10 +81,20 @@ function render() {
       (i) => `<article class="inst-card">
       <span class="inst-type">${esc(i.type)}</span>
       <span class="inst-name">${esc(i.name)}</span>
-      <span class="inst-loc">📍 ${esc(i.city)}, ${esc(i.state)}</span>
+      <span class="inst-loc">${esc(i.city)}, ${esc(i.state)}</span>
       <div class="vc-meta">${(i.tags || []).map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>
       <a class="btn btn-ghost" href="${esc(i.url)}" target="_blank" rel="noopener">Official website ↗</a>
     </article>`
     )
     .join('');
 }
+
+/* scroll reveal — sections fade in as they enter the viewport */
+(() => {
+  document.body.classList.add('reveal-ready');
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add('in'), io.unobserve(e.target))),
+    { threshold: 0.08 }
+  );
+  document.querySelectorAll('.section').forEach((s) => io.observe(s));
+})();

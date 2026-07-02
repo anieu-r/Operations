@@ -9,14 +9,14 @@ It bundles everything a migration business needs on the front door:
 | Feature | What it does |
 | --- | --- |
 | 🔎 **Visa finder** | A 4-question wizard that recommends the visas worth exploring. |
-| 🗂️ **Visa catalogue** | 24 visa subclasses across every category, with plain-language guides, requirements, steps, documents, indicative fees and an official Home Affairs link. Filter by onshore/offshore, category and search. |
+| 🗂️ **Visa catalogue** | 49 visa subclasses across every category — skilled, study, family, visitor, business, humanitarian, bridging, NZ stream and more — with plain-language guides, requirements, steps, documents, indicative fees and an official Home Affairs link. |
 | 📝 **SOP builder** | Generates a structured **Statement of Purpose** / Genuine Student statement from a few prompts, with tailored tips and a checklist. Copy or download as `.txt`. |
 | ✅ **VEVO entitlement check** | Implements the official **Home Affairs "(Visa) Entitlements"** API contract so organisations can verify a visa holder's work/study rights and conditions. |
 | 📰 **News & updates** | Source-linked summaries of significant immigration changes, plus deep-links to the Home Affairs newsroom for anything newer. |
 | 💳 **Fees & payments** | Explains how to pay **government charges directly to the official bodies** (ImmiAccount, BPAY, PayPal) — AusWise never collects government fees. Includes scam-safety guidance. |
 | 💚 **Free platform** | Everything is free. Exactly **two** optional paid extras (expert SOP review, one-on-one session) via Stripe Checkout — nothing else, ever. |
 | 📋 **Application questionnaires** | A professional-grade intake questionnaire tailored to every visa type (`/apply.html`), with autosave/resume, conditional fields and honest next-steps. |
-| 🧑‍💼 **MARN agent directory** | Agents register (free), log in (scrypt + bearer tokens) and manage a public profile; clients rate and review them (`/agents.html`). MARNs are format-checked with OMARA verify links everywhere; example profiles clearly flagged. |
+| 🧑‍💼 **MARN agent directory** | Agents register (free), log in (scrypt + bearer tokens) and manage a public profile; clients rate and review them (`/agents.html`). MARNs are format-checked with OMARA verify links everywhere; example profiles clearly flagged. Agents **earn A$99 per client session** — bank payout details are stored privately (masked, never public); use Stripe Connect or similar in production. |
 | 🏛️ **Institutions window** | Factual, commission-free directory of Australian universities & TAFEs with CRICOS links, plus a partner registration window for institutions (`/institutions.html`). |
 | ✉️ **Email notifications** | New enquiries, questionnaires, contact messages and SOP drafts are emailed to the business inbox (SMTP / Gmail). |
 | 🚀 **Enquiry + contact** | Lightweight intake forms persisted on the backend, each returning a reference number. |
@@ -68,6 +68,7 @@ npm test
 | POST | `/api/checkout/session` | `{ serviceId, email }` → Stripe Checkout URL |
 | GET | `/api/agents` | Agent directory (ratings, filters) |
 | GET/PATCH | `/api/agents/me` | Logged-in agent profile (Bearer token) |
+| PUT | `/api/agents/me/payout` | Bank payout details for the A$99-per-client program (masked, private) |
 | POST | `/api/agents/register` / `login` / `logout` | Agent accounts (scrypt-hashed passwords) |
 | GET | `/api/agents/:id` | Agent profile + reviews |
 | POST | `/api/agents/:id/reviews` | `{ rating 1–5, name, comment }` |

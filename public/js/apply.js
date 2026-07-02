@@ -94,12 +94,12 @@ function renderStep() {
   $('#wizBody').innerHTML = `
     <p class="muted">${esc(q.visaName)} (subclass ${esc(q.visaCode)}) · about ${q.estimatedMinutes} minutes total</p>
     ${state.step === 0 ? `<div class="honest-box"><b>Before you start:</b> ${esc(q.intro)}</div>` : ''}
-    <div class="wiz-section-title">${esc(section.icon)} ${esc(section.title)}</div>
+    <div class="wiz-section-title">${esc(section.title)}</div>
     <form id="wizForm">${visibleFields(section).map(fieldHtml).join('')}</form>
     <div class="wiz-nav">
       ${state.step > 0 ? '<button class="btn btn-ghost" id="wizBack">← Back</button>' : '<span></span>'}
       <span class="wiz-count">Section ${state.step + 1} of ${total}</span>
-      <button class="btn btn-primary" id="wizNext">${state.step === total - 1 ? '✅ Submit questionnaire' : 'Next →'}</button>
+      <button class="btn btn-primary" id="wizNext">${state.step === total - 1 ? 'Submit questionnaire' : 'Next →'}</button>
     </div>`;
 
   // live capture + conditional re-render
@@ -171,7 +171,7 @@ async function submit() {
   localStorage.removeItem(saveKey());
   $('#wizBody').innerHTML = `
     <div class="wiz-done">
-      <span class="big-emoji">🎉</span>
+      <span class="big-emoji"></span>
       <h2>Questionnaire submitted</h2>
       <p>Your reference: <b>${esc(data.reference)}</b> — save it.</p>
       <div class="honest-box">
@@ -195,3 +195,13 @@ async function submit() {
 function scrollTop() {
   $('#wizard').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
+/* scroll reveal — sections fade in as they enter the viewport */
+(() => {
+  document.body.classList.add('reveal-ready');
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add('in'), io.unobserve(e.target))),
+    { threshold: 0.08 }
+  );
+  document.querySelectorAll('.section').forEach((s) => io.observe(s));
+})();

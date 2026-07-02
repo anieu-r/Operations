@@ -15,6 +15,19 @@ import { hashPassword, verifyPassword, issueToken, resolveToken, revokeToken, ne
 
 export const OMARA_SEARCH_URL = 'https://portal.mara.gov.au/search-the-register-of-migration-agents/';
 
+/**
+ * Payout program: when a client books the A$99 one-on-one session with an
+ * agent through AusWise, the agent delivers the session and receives the full
+ * A$99 — the platform keeps nothing (consistent with the no-commissions
+ * promise; AusWise's own revenue is the SOP review product).
+ */
+export const PAYOUT_PROGRAM = {
+  amountCents: 9900,
+  display: 'A$99',
+  description:
+    'You receive the full A$99 for every one-on-one client session booked with you through AusWise. The platform keeps nothing. Payouts are transferred to your nominated bank account after each delivered session.',
+};
+
 export const SPECIALTIES = [
   'Skilled & points-tested',
   'Employer sponsored',
@@ -173,11 +186,48 @@ export function loginAgent({ email, marn, password }) {
   return { agent: publicAgent(agent), token: issueToken(agent.agentId) };
 }
 
+/** Masked view of stored bank details — safe to return to the logged-in agent. */
+function maskedPayout(a) {
+  if (!a.payout) return { set: false };
+  return {
+    set: true,
+    accountName: a.payout.accountName,
+    bsb: a.payout.bsb.replace(/^(\d{3})(\d{3})$/, '$1-$2'),
+    accountNumberMasked: '•'.repeat(Math.max(0, a.payout.accountNumber.length - 3)) + a.payout.accountNumber.slice(-3),
+    updatedAt: a.payout.updatedAt,
+  };
+}
+
 export function agentFromToken(token) {
   const agentId = resolveToken(token);
   if (!agentId) return null;
   const a = findOne('agents', { agentId });
-  return a ? publicAgent(a) : null;
+  // Private view: public profile + masked payout state + program terms.
+  return a ? { ...publicAgent(a), payout: maskedPayout(a), payoutProgram: PAYOUT_PROGRAM } : null;
+}
+
+/**
+ * Attach payout bank details to the logged-in agent. Details are never exposed
+ * publicly and are returned masked. NOTE for production: move to a payment
+ * provider (e.g. Stripe Connect) and encrypt at rest — the bundled JSON store
+ * is demo-grade and stores what you give it.
+ */
+export function setPayoutDetails(token, { accountName, bsb, accountNumber } = {}) {
+  const agentId = resolveToken(token);
+  if (!agentId) return { error: 'Not logged in.' };
+  const name = String(accountName || '').trim().slice(0, 120);
+  const bsbDigits = String(bsb || '').replace(/[^\d]/g, '');
+  const accDigits = String(accountNumber || '').replace(/[^\d]/g, '');
+  if (!name) return { error: 'Please enter the account holder name.' };
+  if (!/^\d{6}$/.test(bsbDigits)) return { error: 'BSB must be 6 digits (e.g. 062-000).' };
+  if (!/^\d{5,10}$/.test(accDigits)) return { error: 'Account number must be 5–10 digits.' };
+  const row = update(
+    'agents',
+    { agentId },
+    { payout: { accountName: name, bsb: bsbDigits, accountNumber: accDigits, updatedAt: new Date().toISOString() } }
+  );
+  if (!row) return { error: 'Account not found.' };
+  return { payout: maskedPayout(row), payoutProgram: PAYOUT_PROGRAM };
 }
 
 export function updateAgentProfile(token, patch) {

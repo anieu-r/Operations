@@ -173,6 +173,44 @@ try {
   const lead = await post('/api/institutions/enquiry', { institutionName: 'Test Uni', contactName: 'Dean', email: 'dean@test.edu' });
   check('institution enquiry accepted', lead.status === 201);
 
+  // ---- payouts ($99 per client) ----------------------------------------------
+  const payoutUnauth = await fetch(base + '/api/agents/me/payout', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ accountName: 'X', bsb: '062000', accountNumber: '12345678' }),
+  });
+  check('payout requires login', payoutUnauth.status === 401);
+
+  const payoutBad = await fetch(base + '/api/agents/me/payout', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${reg.body.token}` },
+    body: JSON.stringify({ accountName: 'Smoke Agent', bsb: '12', accountNumber: '123' }),
+  });
+  check('payout validates BSB/account', payoutBad.status === 400);
+
+  const payoutOk = await fetch(base + '/api/agents/me/payout', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${reg.body.token}` },
+    body: JSON.stringify({ accountName: 'Smoke Agent', bsb: '062-000', accountNumber: '12345678' }),
+  }).then((r) => r.json());
+  check('payout saves and masks account number', payoutOk.ok && payoutOk.payout.accountNumberMasked.endsWith('678') && !payoutOk.payout.accountNumberMasked.startsWith('12345'));
+
+  const meAfter = await fetch(base + '/api/agents/me', { headers: { Authorization: `Bearer ${reg.body.token}` } }).then((r) => r.json());
+  check('me includes masked payout + $99 program', meAfter.agent.payout.set === true && meAfter.agent.payoutProgram.amountCents === 9900);
+
+  const publicProfile = await get(`/api/agents/${reg.body.agent.agentId}`);
+  check('bank details never on public profile', JSON.stringify(publicProfile.body).includes('12345678') === false && publicProfile.body.agent.payout === undefined);
+
+  // ---- expanded catalogue ------------------------------------------------------
+  const allVisas = await get('/api/visas');
+  check('catalogue has 48+ subclasses', allVisas.body.count >= 48);
+  const eta = await get('/api/visas/601');
+  check('ETA 601 present', eta.body.visa?.name.includes('Electronic Travel Authority'));
+  const bva = await get('/api/visas/010');
+  check('Bridging visa A present', bva.body.visa?.category === 'Residence & Other');
+  const qBridging = await get('/api/questionnaires/010');
+  check('questionnaire works for new subclasses', qBridging.body.questionnaire.sections.length >= 7);
+
   // ---- SOP upgrades ----------------------------------------------------------
   const sopPrev = await post('/api/sop', { fullName: 'Prev', purpose: 'study', preview: true, tone: 'warm', length: 'detailed' });
   check('sop preview mode skips persistence', sopPrev.body.preview === true && sopPrev.body.reference === null);

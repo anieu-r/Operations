@@ -184,13 +184,13 @@ async function openVisaModal(code) {
       <div class="m-stat"><span>Duration</span><b>${esc(v.duration)}</b></div>
       <div class="m-stat"><span>Processing</span><b>${esc(v.processingTime)}</b></div>
     </div>
-    <div class="m-section"><h4>✅ Key requirements</h4><ul class="m-list">${list(v.requirements)}</ul></div>
-    <div class="m-section"><h4>🪜 How to apply</h4><ol class="m-steps">${list(v.steps)}</ol></div>
-    <div class="m-section"><h4>📎 Documents you’ll likely need</h4><ul class="m-list">${list(v.documents)}</ul></div>
+    <div class="m-section"><h4>Key requirements</h4><ul class="m-list">${list(v.requirements)}</ul></div>
+    <div class="m-section"><h4>How to apply</h4><ol class="m-steps">${list(v.steps)}</ol></div>
+    <div class="m-section"><h4>Documents you’ll likely need</h4><ul class="m-list">${list(v.documents)}</ul></div>
     <div class="m-section"><p><b>Work rights:</b> ${esc(v.workRights)}</p></div>
     <p class="m-note">⚠️ Fees and rules change (often on 1 July). Always confirm the current charge and criteria on the official Home Affairs page before lodging.</p>
     <div class="m-cta">
-      <a class="btn btn-primary" href="/apply.html?visa=${encodeURIComponent(v.code)}">🚀 Start my application — free</a>
+      <a class="btn btn-primary" href="/apply.html?visa=${encodeURIComponent(v.code)}">Start my application — free</a>
       <a class="btn btn-ghost" href="${esc(v.officialUrl)}" target="_blank" rel="noopener">View on Home Affairs ↗</a>
       <a class="btn btn-ghost" href="#apply" data-close>Ask a question first</a>
     </div>`;
@@ -246,7 +246,7 @@ async function submitFinder() {
   }
   const recs = data.recommendations || [];
   $('#finderBody').innerHTML = `
-    <div class="q-label">🎉 Your top matches</div>
+    <div class="q-label">Your top matches</div>
     <div class="rec-list">
       ${
         recs.length
@@ -349,13 +349,13 @@ function renderSOP(data, name, isPreview = false) {
       <p class="fineprint">Target length: ${esc(data.wordCountTarget)}. Edit it to sound like you — and keep every claim true.</p>
       <div class="sop-draft" id="sopDraft">${esc(data.draft)}</div>
       <div class="result-actions">
-        <button class="btn btn-ghost" id="copySop">📋 Copy</button>
-        <button class="btn btn-primary" id="downloadSop">⬇️ Download .txt</button>
+        <button class="btn btn-ghost" id="copySop">Copy</button>
+        <button class="btn btn-primary" id="downloadSop">Download .txt</button>
       </div>
-      <div class="m-section"><h4>💡 Tips for a strong SOP</h4><ul class="sop-tips">${(data.tips || [])
+      <div class="m-section"><h4>Tips for a strong SOP</h4><ul class="sop-tips">${(data.tips || [])
         .map((t) => `<li>${esc(t)}</li>`)
         .join('')}</ul></div>
-      <div class="m-section"><h4>📋 Checklist</h4><ul class="m-list">${(data.checklist || [])
+      <div class="m-section"><h4>Checklist</h4><ul class="m-list">${(data.checklist || [])
         .map((c) => `<li>${esc(c)}</li>`)
         .join('')}</ul></div>
     </div>`;
@@ -449,8 +449,8 @@ function renderVevo(res) {
         ${item('Residence', d.residenceStatus)}
         ${item('Education sector', d.educationSector && d.educationSector.replace(/_/g, ' '))}
       </div>
-      ${conds('💼 Work conditions', d.workConditions)}
-      ${conds('🎓 Study conditions', d.studyConditions)}
+      ${conds('Work conditions', d.workConditions)}
+      ${conds('Study conditions', d.studyConditions)}
       <p class="fineprint">Category checked: ${esc((res.requestedCategory || '').replace(/_/g, ' '))} · ${esc(res.checkedAt || '')}</p>
     </div>`;
 }
@@ -518,8 +518,8 @@ async function loadServices() {
   if (banner) {
     banner.hidden = false;
     banner.innerHTML = enabled
-      ? '🔒 <b>The two optional extras below</b> use secure Stripe checkout. Everything above is free — no card needed.'
-      : '💬 <b>Online payment isn’t switched on yet.</b> The extras below are optional anyway — send a free enquiry and we’ll arrange it if you want one.';
+      ? '<b>The two optional extras below</b> use secure Stripe checkout. Everything above is free — no card needed.'
+      : '<b>Online payment isn’t switched on yet.</b> The extras below are optional anyway — send a free enquiry and we’ll arrange it if you want one.';
     banner.classList.toggle('on', !!enabled);
   }
   $('#payFootnote').textContent = data.note || '';
@@ -531,7 +531,7 @@ async function loadServices() {
         <div class="svc-price">${esc(s.display)}</div>
         <p class="svc-desc">${esc(s.description)}</p>
         <button class="btn ${s.popular ? 'btn-primary' : 'btn-ghost'} svc-buy" data-id="${esc(s.id)}" data-name="${esc(s.name)}">
-          ${enabled ? '💳 Book &amp; pay' : '✉️ Enquire'}
+          ${enabled ? 'Book &amp; pay' : 'Enquire'}
         </button>
       </article>`
     )
@@ -608,3 +608,13 @@ function bindForm(sel, endpoint, resetLabel, successMsg) {
     form.reset();
   });
 }
+
+/* scroll reveal — sections fade in as they enter the viewport */
+(() => {
+  document.body.classList.add('reveal-ready');
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add('in'), io.unobserve(e.target))),
+    { threshold: 0.08 }
+  );
+  document.querySelectorAll('.section').forEach((s) => io.observe(s));
+})();

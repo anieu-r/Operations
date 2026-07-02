@@ -42,10 +42,12 @@ import {
   loginAgent,
   agentFromToken,
   updateAgentProfile,
+  setPayoutDetails,
   logoutAgent,
   addReview,
   SPECIALTIES,
   OMARA_SEARCH_URL,
+  PAYOUT_PROGRAM,
 } from './agents.js';
 import { getQuestionnaire, validateResponses } from './data/questionnaires.js';
 import {
@@ -284,6 +286,7 @@ app.get('/api/agents', (req, res) => {
     agents: listAgents({ q: q ? String(q) : undefined, specialty: specialty ? String(specialty) : undefined }),
     specialties: SPECIALTIES,
     omaraSearchUrl: OMARA_SEARCH_URL,
+    payoutProgram: PAYOUT_PROGRAM,
     notice:
       'MARNs are format-checked but not auto-verified — always confirm an agent on the official OMARA register before engaging them. Example profiles are clearly labelled. Listing and reviews are free.',
   });
@@ -337,6 +340,17 @@ app.post('/api/agents/logout', (req, res) => {
 app.patch('/api/agents/me', (req, res) => {
   const result = updateAgentProfile(bearerFrom(req), req.body || {});
   if (result.error) return res.status(401).json({ ok: false, error: result.error });
+  res.json({ ok: true, ...result });
+});
+
+// Payout bank details ($99-per-client program). Stored server-side only,
+// returned masked, never present on public profiles.
+app.put('/api/agents/me/payout', (req, res) => {
+  const result = setPayoutDetails(bearerFrom(req), req.body || {});
+  if (result.error) {
+    const status = result.error === 'Not logged in.' ? 401 : 400;
+    return res.status(status).json({ ok: false, error: result.error });
+  }
   res.json({ ok: true, ...result });
 });
 

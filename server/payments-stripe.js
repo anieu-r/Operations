@@ -41,7 +41,7 @@ export const SERVICES = [
     id: 'consult-1on1',
     name: 'One-on-one detailed session',
     description:
-      'A private video/phone session to go deep on your situation: pathway strategy, points, timing, risks and a step-by-step plan.',
+      'A private video/phone session to go deep on your situation: pathway strategy, points, timing, risks and a step-by-step plan. Delivered by a registered agent from our directory, who receives the full A$99 — we keep nothing.',
     amount: 9900,
     popular: true,
   },
