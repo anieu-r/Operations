@@ -33,20 +33,22 @@
       <a href="#finder">Find my visa</a>
       <a href="#visas">Visas</a>
       <a href="#sop">SOP builder</a>
-      <a href="#vevo">Check visa</a>
+      <a href="/agents.html">Agents</a>
+      <a href="/institutions.html">Institutions</a>
       <a href="#news">Updates</a>
       <a href="#fees">Fees</a>
-      <a href="#services">Get help</a>
-      <a href="#apply" class="nav-cta">Start now</a>
+      <a href="/apply.html" class="nav-cta">Start application</a>
     </nav>
     <button class="nav-toggle" aria-label="Open menu">☰</button>
   </header>
+
+  <div class="free-strip">🎉 AusWise is <b>100% free to use</b> — you only ever pay for two optional extras: an expert SOP review or a one-on-one session. <a href="#services">See exactly what's free →</a></div>
 
   <main id="top">
     <!-- HERO -->
     <section class="hero">
       <div class="hero-inner">
-        <span class="pill">🇦🇺 Onshore &amp; offshore · all visa types</span>
+        <span class="pill">🇦🇺 Onshore &amp; offshore · all visa types · free platform</span>
         <h1>Moving to Australia,<br />made <span class="hl">simple</span>.</h1>
         <p class="lede">
           No confusing jargon. No 100-page PDFs. Answer a few easy questions and we’ll
@@ -147,8 +149,21 @@
             <textarea name="goals" rows="2" placeholder="e.g. gain skills then return to lead my team back home"></textarea></label>
           <label>Anything else to include? (optional)
             <textarea name="extra" rows="2" placeholder="Add any extra context in your own words"></textarea></label>
+          <div class="sop-controls">
+            <label>Tone
+              <select name="tone">
+                <option value="formal">Formal (recommended)</option>
+                <option value="warm">Warm &amp; personal</option>
+              </select></label>
+            <label>Length
+              <select name="length">
+                <option value="standard">Standard</option>
+                <option value="concise">Concise</option>
+                <option value="detailed">Detailed (with prompts)</option>
+              </select></label>
+          </div>
           <button class="btn btn-primary" type="submit">✨ Generate my SOP draft</button>
-          <p class="fineprint">We store only your name, purpose and subclass to improve the tool — not the free-text details.</p>
+          <p class="fineprint">Free &amp; unlimited. The preview updates live as you type. We store only your name, purpose and subclass — not the free-text details.</p>
         </form>
         <div class="sop-output glass" id="sopOutput">
           <div class="sop-placeholder">
@@ -216,15 +231,35 @@
       </div>
     </section>
 
-    <!-- SERVICES / PAID CONSULTATIONS -->
+    <!-- PRICING: FREE PLATFORM + TWO OPTIONAL EXTRAS -->
     <section id="services" class="section">
       <div class="section-head">
-        <h2>🤝 Get expert help</h2>
-        <p>Book a paid consultation or assessment with a migration professional. <strong>These are AusWise service fees only</strong> — government visa charges are always paid separately, directly to Home Affairs.</p>
+        <h2>💚 Free platform, honest pricing</h2>
+        <p>Everything you need to understand and prepare your application is free. There are exactly <strong>two</strong> optional paid extras — nothing else, ever. Government visa charges always go directly to Home Affairs, never through us.</p>
+      </div>
+      <div class="glass free-card">
+        <h3>✅ Free — all of it, forever</h3>
+        <ul class="free-list" id="freeList"></ul>
       </div>
       <div class="pay-note-banner glass" id="payBanner" hidden></div>
       <div class="services-grid" id="servicesGrid"></div>
       <p class="fineprint center" id="payFootnote"></p>
+    </section>
+
+    <!-- TRANSPARENCY -->
+    <section id="promises" class="section">
+      <div class="section-head">
+        <h2>🤝 Our promises — nothing hidden</h2>
+        <p>Migration is full of agencies that hide fees, oversell chances and bury the fine print. We built this platform to end that.</p>
+      </div>
+      <div class="promise-grid">
+        <div class="promise"><h4>💬 Honest feedback, even when it hurts</h4><p>If your case is weak, we say so and explain why — before you spend a cent or lodge anything.</p></div>
+        <div class="promise"><h4>🔗 Primary sources everywhere</h4><p>Every visa, fee and rule links to the official Home Affairs page so you can verify us in one click.</p></div>
+        <div class="promise"><h4>🚫 No commissions, no pay-to-rank</h4><p>Agents and institutions can't pay for placement or better ratings. Reviews appear as submitted.</p></div>
+        <div class="promise"><h4>💳 Government fees go to the government</h4><p>Visa application charges are paid directly to Home Affairs via ImmiAccount. We never touch them.</p></div>
+        <div class="promise"><h4>🏷️ Two paid extras, clearly labelled</h4><p>An SOP review and a 1:1 session. That's the entire price list. Everything else is free.</p></div>
+        <div class="promise"><h4>⚖️ Know our limits</h4><p>We're an information platform, not a law firm. For formal advice, use a MARN agent (verify on OMARA) or a lawyer — our directory is free.</p></div>
+      </div>
     </section>
 
     <!-- APPLY / CONTACT -->
@@ -291,7 +326,10 @@
         <h4>Explore</h4>
         <a href="#finder">Find my visa</a>
         <a href="#visas">All visas</a>
+        <a href="/apply.html">Start application</a>
         <a href="#sop">SOP builder</a>
+        <a href="/agents.html">Migration agents</a>
+        <a href="/institutions.html">Universities &amp; colleges</a>
         <a href="#news">Updates</a>
       </div>
       <div>

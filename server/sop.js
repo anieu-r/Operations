@@ -26,10 +26,24 @@ function sentenceList(items) {
   return `${arr.slice(0, -1).join(', ')} and ${arr[arr.length - 1]}`;
 }
 
+const TONE = {
+  formal: {
+    open: 'I am writing this Statement of Purpose to support my application for',
+    close:
+      'I confirm that the information in this statement is true and correct. I respectfully request that my application be considered favourably. Thank you for taking the time to review my Statement of Purpose.',
+  },
+  warm: {
+    open: 'I would like to share my story and purpose in support of my application for',
+    close:
+      'Everything I have written here is true and reflects my genuine intentions. Thank you sincerely for reading my statement and considering my application.',
+  },
+};
+
 /**
  * @param {object} input
  *   fullName, nationality, purpose, visaCode, course, institution, occupation,
- *   employer, ties (home-country ties), funds, goals, partnerName, extra
+ *   employer, ties (home-country ties), funds, goals, partnerName, extra,
+ *   tone ('formal'|'warm'), length ('concise'|'standard'|'detailed')
  */
 export function buildSOP(input = {}) {
   const name = clean(input.fullName) || 'I';
@@ -46,16 +60,22 @@ export function buildSOP(input = {}) {
   const goals = clean(input.goals);
   const partnerName = clean(input.partnerName);
   const extra = clean(input.extra);
+  const tone = TONE[clean(input.tone)] ? clean(input.tone) : 'formal';
+  const length = ['concise', 'standard', 'detailed'].includes(clean(input.length))
+    ? clean(input.length)
+    : 'standard';
 
   const intro = [];
   intro.push(
     `My name is ${name}${nationality ? `, a citizen of ${nationality}` : ''}. ` +
-      `I am writing this Statement of Purpose to support my application for ${purposeLabel}` +
+      `${TONE[tone].open} ${purposeLabel}` +
       `${visaCode ? ` (subclass ${visaCode})` : ''} to Australia.`
   );
-  intro.push(
-    `In this statement I explain my background, my reasons for choosing Australia, my plans, and how I meet the requirements of this visa.`
-  );
+  if (length !== 'concise') {
+    intro.push(
+      `In this statement I explain my background, my reasons for choosing Australia, my plans, and how I meet the requirements of this visa.`
+    );
+  }
 
   const body = [];
 
@@ -156,16 +176,33 @@ export function buildSOP(input = {}) {
     body.push({ heading: 'Additional information', text: extra });
   }
 
-  const conclusion =
-    `I confirm that the information in this statement is true and correct. ` +
-    `I respectfully request that my application be considered favourably. ` +
-    `Thank you for taking the time to review my Statement of Purpose.`;
+  // Length shaping: detailed adds guided elaboration prompts the writer fills
+  // in; concise trims the generic connective sentences.
+  if (length === 'detailed') {
+    body.push({
+      heading: 'Supporting details (fill these in)',
+      text:
+        '[Add 2–3 specific examples with dates and numbers: an achievement, a project, a turning point that led you here. Specific beats general — one real example is worth a page of adjectives.]',
+    });
+  }
+
+  const conclusion = TONE[tone].close;
 
   const draft = assemble(intro, body, conclusion, name);
+  const words = draft.split(/\s+/).filter(Boolean).length;
   const tips = tipsFor(purpose);
   const checklist = checklistFor(purpose);
 
-  return { draft, tips, checklist, wordCountTarget: '500–1000 words for most visas' };
+  return {
+    draft,
+    sections: [{ heading: 'Introduction', text: intro.join(' ') }, ...body, { heading: 'Declaration', text: conclusion }],
+    wordCount: words,
+    tone,
+    length,
+    tips,
+    checklist,
+    wordCountTarget: '500–1000 words for most visas',
+  };
 }
 
 function assemble(intro, body, conclusion, name) {

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Universities & Colleges — AusWise Migration</title>
+  <meta name="description" content="Explore Australian universities and TAFE providers with factual, commission-free listings. Institutions can register to manage their listing." />
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="bg-decor" aria-hidden="true">
+    <span class="blob blob-2"></span><span class="blob blob-3"></span>
+    <span class="float-icon fi-2">🎓</span><span class="float-icon fi-4">🏛️</span>
+  </div>
+
+  <header class="nav">
+    <a class="brand" href="/"><img class="brand-mark" src="/assets/logo.svg" alt="AusWise logo" width="36" height="36" /><span class="brand-name">Aus<span>Wise</span> Migration</span></a>
+    <nav class="nav-links">
+      <a href="/">Home</a>
+      <a href="/#visas">Visas</a>
+      <a href="/apply.html">Start application</a>
+      <a href="/agents.html">Agents</a>
+      <a href="#partner" class="nav-cta">For institutions</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Open menu">☰</button>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <span class="free-pill">✅ Factual listings · no commissions · no pay-to-rank</span>
+      <h1>🏛️ Universities &amp; colleges</h1>
+      <p>Explore Australian institutions with plain facts — no rankings we can’t stand behind, no sponsored placements. <strong>Always verify a course and provider on the official CRICOS register</strong> before applying or paying anyone.</p>
+      <a class="btn btn-ghost" id="cricosBtn" target="_blank" rel="noopener">Search the official CRICOS register ↗</a>
+      <a class="btn btn-ghost" id="studyAusBtn" target="_blank" rel="noopener">Study Australia (official) ↗</a>
+    </div>
+
+    <section class="section">
+      <div class="filters">
+        <div class="seg" id="typeFilter">
+          <button data-t="" class="active">All types</button>
+          <button data-t="University">Universities</button>
+          <button data-t="TAFE / Vocational">TAFE / Vocational</button>
+        </div>
+        <input id="instSearch" class="search" type="search" placeholder="Search name or city…" />
+      </div>
+      <div class="chips" id="stateChips"></div>
+      <p class="muted" id="instNotice"></p>
+      <div class="inst-grid" id="instGrid"></div>
+      <p class="muted center" id="instEmpty" hidden>No institutions match that filter.</p>
+    </section>
+
+    <!-- INSTITUTION PARTNER WINDOW -->
+    <section class="section" id="partner">
+      <div class="section-head">
+        <h2>🏫 For education institutions</h2>
+        <p>Universities, TAFEs and colleges: register to manage your listing and receive genuinely interested, questionnaire-qualified students. Listing is free — we don’t sell placement and we don’t take commissions on students.</p>
+      </div>
+      <div class="apply-wrap">
+        <form class="glass" id="partnerForm" style="padding: clamp(1.3rem,3vw,1.9rem)">
+          <label>Institution name *<input name="institutionName" required placeholder="e.g. Example Institute of Technology" /></label>
+          <div class="grid-2">
+            <label>Contact name *<input name="contactName" required placeholder="Full name" /></label>
+            <label>Work email *<input name="email" type="email" required placeholder="you@institution.edu.au" /></label>
+          </div>
+          <label>CRICOS provider code (if registered)<input name="cricosCode" placeholder="e.g. 00123A" /></label>
+          <label>Tell us about your institution<textarea name="message" rows="3" placeholder="Sector, campuses, popular courses for international students…"></textarea></label>
+          <button class="btn btn-primary btn-lg" type="submit">Register interest — free</button>
+          <p class="fineprint">We verify CRICOS registration before listing course information. We never charge students for introductions and never rank providers for money.</p>
+        </form>
+        <aside class="glass apply-side">
+          <h3>How listings work</h3>
+          <ol class="steps">
+            <li>You register interest with your CRICOS code.</li>
+            <li>We verify registration on the official register.</li>
+            <li>Your listing shows factual info: sector, locations, official links.</li>
+            <li>Students reach you directly — no middle-agent commissions.</li>
+          </ol>
+          <div class="divider"></div>
+          <p class="fineprint">Our promise to students is honest, unbiased information; our promise to institutions is qualified interest, not inflated numbers. Those promises only work together.</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="disclaimer">
+      <p><strong>Transparency:</strong> listings show public, factual information and official links only. AusWise receives no commissions from institutions and does not rank providers for payment. Confirm CRICOS registration and course details on the <a href="https://cricos.education.gov.au/" target="_blank" rel="noopener">official register</a>.</p>
+      <p class="muted">© <span id="year"></span> AusWise Migration.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" hidden></div>
+  <script src="/js/institutions.js" type="module"></script>
+</body>
+</html>
