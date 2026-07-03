@@ -100,7 +100,7 @@ function renderAgents() {
         ${a.languages.map((l) => `<span class="tag type">${esc(l)}</span>`).join('')}</div>
       <div class="agent-actions">
         <button class="btn btn-ghost a-open" data-id="${esc(a.agentId)}">Reviews &amp; profile</button>
-        <button class="btn btn-primary a-review" data-id="${esc(a.agentId)}">⭐ Rate this agent</button>
+        <button class="btn btn-primary a-review" data-id="${esc(a.agentId)}">Rate this agent</button>
       </div>
     </article>`
     )
@@ -239,6 +239,24 @@ function initAuth() {
     toast('Profile saved.', 'ok');
     loadDirectory();
   });
+
+  $('#payoutForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(e.target).entries());
+    const { ok, data } = await api('/agents/me/payout', { method: 'PUT', body: JSON.stringify(fd) });
+    if (!ok) return toast(data.error || 'Could not save payout details.', 'err');
+    renderPayoutStatus(data.payout);
+    e.target.reset();
+    toast('Payout details saved — you’re set to receive A$99 per client.', 'ok');
+  });
+}
+
+function renderPayoutStatus(payout) {
+  const el = $('#payoutStatus');
+  if (!el) return;
+  el.innerHTML = payout?.set
+    ? `✔ Payouts active — <b>${esc(payout.accountName)}</b>, BSB ${esc(payout.bsb)}, account ${esc(payout.accountNumberMasked)}. Submit the form again to replace these details.`
+    : 'No bank details on file yet — add them below to receive payouts.';
 }
 
 async function refreshSession() {
@@ -261,6 +279,11 @@ async function showDash(agent) {
   $('#authArea').hidden = true;
   $('#dashArea').hidden = false;
   $('#dashName').textContent = `${agent.name} · MARN ${agent.marn}`;
+  if (agent.payoutProgram) {
+    $('#payoutAmount').textContent = agent.payoutProgram.display;
+    $('#payoutBlurb').textContent = agent.payoutProgram.description;
+  }
+  renderPayoutStatus(agent.payout);
   const f = $('#profileForm');
   f.location.value = agent.location || '';
   f.bio.value = agent.bio || '';
@@ -272,3 +295,13 @@ async function showDash(agent) {
     ? reviews.map((r) => `<div class="review"><div class="r-head"><span>${stars(r.rating)} <b>${esc(r.name)}</b></span><span class="muted">${new Date(r.createdAt).toLocaleDateString('en-AU')}</span></div><p>${esc(r.comment)}</p></div>`).join('')
     : '<p class="muted">No reviews yet. Share your profile link with clients.</p>';
 }
+
+/* scroll reveal — sections fade in as they enter the viewport */
+(() => {
+  document.body.classList.add('reveal-ready');
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add('in'), io.unobserve(e.target))),
+    { threshold: 0.08 }
+  );
+  document.querySelectorAll('.section').forEach((s) => io.observe(s));
+})();

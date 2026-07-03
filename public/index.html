@@ -6,21 +6,23 @@
   <title>AusWise Migration — Apply for Australian visas the easy way</title>
   <meta name="description" content="AusWise Migration makes applying for Australian visas simple. Find your visa in 30 seconds, build your Statement of Purpose, read the latest Home Affairs updates, and pay official fees the right way." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;450;500;550;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
-  <!-- floating background blobs -->
+  <!-- floating background: soft orbs + abstract geometry -->
   <div class="bg-decor" aria-hidden="true">
     <span class="blob blob-1"></span>
     <span class="blob blob-2"></span>
     <span class="blob blob-3"></span>
-    <span class="float-icon fi-1">🛂</span>
-    <span class="float-icon fi-2">✈️</span>
-    <span class="float-icon fi-3">🦘</span>
-    <span class="float-icon fi-4">🐨</span>
-    <span class="float-icon fi-5">🌏</span>
-    <span class="float-icon fi-6">📄</span>
+    <span class="float-icon fi-1"></span>
+    <span class="float-icon fi-2"></span>
+    <span class="float-icon fi-3"></span>
+    <span class="float-icon fi-4"></span>
+    <span class="float-icon fi-5"></span>
+    <span class="float-icon fi-6"></span>
   </div>
 
   <!-- NAV -->
@@ -42,21 +44,20 @@
     <button class="nav-toggle" aria-label="Open menu">☰</button>
   </header>
 
-  <div class="free-strip">🎉 AusWise is <b>100% free to use</b> — you only ever pay for two optional extras: an expert SOP review or a one-on-one session. <a href="#services">See exactly what's free →</a></div>
+  <div class="free-strip">AusWise is <b>100% free to use</b> — you only ever pay for two optional extras: an expert SOP review or a one-on-one session. <a href="#services">See exactly what's free →</a></div>
 
   <main id="top">
     <!-- HERO -->
     <section class="hero">
       <div class="hero-inner">
-        <span class="pill">🇦🇺 Onshore &amp; offshore · all visa types · free platform</span>
-        <h1>Moving to Australia,<br />made <span class="hl">simple</span>.</h1>
+        <span class="pill">Onshore &amp; offshore · every visa type · built on official sources</span>
+        <h1>Your Australian visa,<br /><span class="hl">clearly</span> explained.</h1>
         <p class="lede">
-          No confusing jargon. No 100-page PDFs. Answer a few easy questions and we’ll
-          show you the right visa, the real steps, and exactly where to pay —
-          <strong>straight to the official bodies</strong>.
+          First time applying? Good. We built this for you — plain language, real steps,
+          honest advice, and every fee paid <strong>directly to the official bodies</strong>.
         </p>
         <div class="hero-cta">
-          <a href="#finder" class="btn btn-primary btn-lg">🔎 Find my visa — 30 seconds</a>
+          <a href="#finder" class="btn btn-primary btn-lg">Find my visa — 30 seconds</a>
           <a href="#visas" class="btn btn-ghost btn-lg">Browse all visas</a>
         </div>
         <ul class="hero-stats" id="heroStats">
@@ -66,10 +67,10 @@
         </ul>
       </div>
       <div class="hero-card glass" aria-hidden="true">
-        <div class="hc-row"><span class="hc-emoji">🛂</span><div><b>Pick your visa</b><small>Skilled, student, partner, visitor &amp; more</small></div></div>
-        <div class="hc-row"><span class="hc-emoji">📝</span><div><b>Build your SOP</b><small>Guided Statement of Purpose in minutes</small></div></div>
-        <div class="hc-row"><span class="hc-emoji">💳</span><div><b>Pay officially</b><small>Direct to Home Affairs via ImmiAccount</small></div></div>
-        <div class="hc-row"><span class="hc-emoji">📰</span><div><b>Stay updated</b><small>Latest changes from Home Affairs</small></div></div>
+        <div class="hc-row"><span class="hc-emoji">01</span><div><b>Find your visa</b><small>Skilled, student, partner, visitor &amp; more</small></div></div>
+        <div class="hc-row"><span class="hc-emoji">02</span><div><b>Answer the questionnaire</b><small>Professional intake, tailored to your visa</small></div></div>
+        <div class="hc-row"><span class="hc-emoji">03</span><div><b>Build your SOP</b><small>Guided statement with live preview</small></div></div>
+        <div class="hc-row"><span class="hc-emoji">04</span><div><b>Lodge &amp; pay officially</b><small>Direct to Home Affairs via ImmiAccount</small></div></div>
       </div>
     </section>
 
@@ -81,8 +82,9 @@
     <!-- VISA FINDER -->
     <section id="finder" class="section">
       <div class="section-head">
-        <h2>🔎 Find my visa</h2>
-        <p>Tap the answers that fit you. We’ll suggest the visas worth exploring.</p>
+        <span class="eyebrow">Visa finder</span>
+        <h2>Which visa fits you?</h2>
+        <p>Tap the answers that fit you. We’ll suggest the visas worth exploring — in about 30 seconds.</p>
       </div>
       <div class="finder glass" id="finder-app">
         <div class="finder-progress"><span id="finderBar"></span></div>
@@ -93,7 +95,8 @@
     <!-- VISA CATALOG -->
     <section id="visas" class="section">
       <div class="section-head">
-        <h2>🗂️ Every visa, explained simply</h2>
+        <span class="eyebrow">The catalogue</span>
+        <h2>Every visa, explained simply</h2>
         <p>Filter by what you need. Each card opens a plain-language guide with steps, documents and the official link.</p>
       </div>
 
@@ -102,6 +105,7 @@
           <button data-loc="" class="active">All</button>
           <button data-loc="onshore">In Australia (onshore)</button>
           <button data-loc="offshore">Outside Australia (offshore)</button>
+          <button data-loc="flexible">Apply from anywhere</button>
         </div>
         <input id="visaSearch" class="search" type="search" placeholder="Search e.g. student, partner, 189…" />
       </div>
@@ -114,8 +118,9 @@
     <!-- SOP BUILDER -->
     <section id="sop" class="section">
       <div class="section-head">
-        <h2>📝 Statement of Purpose (SOP) builder</h2>
-        <p>Answer a few prompts and we’ll draft a clean, structured SOP you can edit and download. Honest, specific statements work best — this is a starting point, not a template to copy.</p>
+        <span class="eyebrow">SOP studio</span>
+        <h2>Your Statement of Purpose, drafted with you</h2>
+        <p>Answer a few prompts and watch a clean, structured draft build itself as you type. Honest, specific statements work best — this is a starting point, not a template to copy.</p>
       </div>
       <div class="sop-wrap">
         <form class="sop-form glass" id="sopForm">
@@ -162,12 +167,12 @@
                 <option value="detailed">Detailed (with prompts)</option>
               </select></label>
           </div>
-          <button class="btn btn-primary" type="submit">✨ Generate my SOP draft</button>
+          <button class="btn btn-primary" type="submit">Generate my draft</button>
           <p class="fineprint">Free &amp; unlimited. The preview updates live as you type. We store only your name, purpose and subclass — not the free-text details.</p>
         </form>
         <div class="sop-output glass" id="sopOutput">
           <div class="sop-placeholder">
-            <span class="big-emoji">📄</span>
+            <span class="big-emoji"></span>
             <p>Your draft will appear here. Fill in the form and hit generate.</p>
           </div>
         </div>
@@ -177,7 +182,8 @@
     <!-- VEVO ENTITLEMENT CHECK -->
     <section id="vevo" class="section">
       <div class="section-head">
-        <h2>✅ Check a visa’s conditions (VEVO)</h2>
+        <span class="eyebrow">VEVO check</span>
+        <h2>Check a visa’s conditions</h2>
         <p>For employers, education providers and agencies. Verify a visa holder’s work rights, study rights and conditions using the official <strong>Home Affairs Visa Entitlement Verification</strong> contract.</p>
       </div>
       <div class="vevo-wrap">
@@ -195,12 +201,12 @@
             <label>Issuing country (3-letter) *<input name="travelDocumentIssuingCountry" required maxlength="3" placeholder="e.g. AUS" style="text-transform:uppercase" /></label>
           </div>
           <label>Date of birth *<input name="birthDate" type="date" required /></label>
-          <button class="btn btn-primary" type="submit">🔍 Run entitlement check</button>
+          <button class="btn btn-primary" type="submit">Run entitlement check</button>
           <p class="fineprint">Only check people who have consented. The live service requires organisation enrolment via Home Affairs Access Manager. In demo mode, results are simulated and clearly labelled.</p>
         </form>
         <div class="vevo-output glass" id="vevoOutput">
           <div class="sop-placeholder">
-            <span class="big-emoji">🪪</span>
+            <span class="big-emoji"></span>
             <p>Entitlement results will appear here.</p>
           </div>
         </div>
@@ -210,7 +216,8 @@
     <!-- NEWS -->
     <section id="news" class="section">
       <div class="section-head">
-        <h2>📰 Visa news &amp; changes</h2>
+        <span class="eyebrow">Updates</span>
+        <h2>Visa news &amp; changes</h2>
         <p>Important, source-linked updates. For anything brand-new, jump straight to Home Affairs.</p>
       </div>
       <div class="news-grid" id="newsGrid"><!-- JS --></div>
@@ -220,12 +227,13 @@
     <!-- FEES & PAYMENTS -->
     <section id="fees" class="section">
       <div class="section-head">
-        <h2>💳 Fees &amp; payments — pay the official bodies directly</h2>
+        <span class="eyebrow">Official fees</span>
+        <h2>Pay the official bodies directly</h2>
         <p>Government charges go <strong>straight to the Department of Home Affairs</strong> (and other official bodies). AusWise never collects government fees.</p>
       </div>
       <div class="pay-grid" id="payGrid"></div>
       <div class="safety glass">
-        <h3>🛡️ Stay safe from scams</h3>
+        <h3>Stay safe from scams</h3>
         <ul id="safetyTips"></ul>
         <a id="omaraLink" class="btn btn-ghost" target="_blank" rel="noopener">Check a migration agent on the official register ↗</a>
       </div>
@@ -234,11 +242,12 @@
     <!-- PRICING: FREE PLATFORM + TWO OPTIONAL EXTRAS -->
     <section id="services" class="section">
       <div class="section-head">
-        <h2>💚 Free platform, honest pricing</h2>
+        <span class="eyebrow">Pricing</span>
+        <h2>Free platform, honest pricing</h2>
         <p>Everything you need to understand and prepare your application is free. There are exactly <strong>two</strong> optional paid extras — nothing else, ever. Government visa charges always go directly to Home Affairs, never through us.</p>
       </div>
       <div class="glass free-card">
-        <h3>✅ Free — all of it, forever</h3>
+        <h3>Free — all of it, forever</h3>
         <ul class="free-list" id="freeList"></ul>
       </div>
       <div class="pay-note-banner glass" id="payBanner" hidden></div>
@@ -249,23 +258,25 @@
     <!-- TRANSPARENCY -->
     <section id="promises" class="section">
       <div class="section-head">
-        <h2>🤝 Our promises — nothing hidden</h2>
+        <span class="eyebrow">Transparency</span>
+        <h2>Our promises — nothing hidden</h2>
         <p>Migration is full of agencies that hide fees, oversell chances and bury the fine print. We built this platform to end that.</p>
       </div>
       <div class="promise-grid">
-        <div class="promise"><h4>💬 Honest feedback, even when it hurts</h4><p>If your case is weak, we say so and explain why — before you spend a cent or lodge anything.</p></div>
-        <div class="promise"><h4>🔗 Primary sources everywhere</h4><p>Every visa, fee and rule links to the official Home Affairs page so you can verify us in one click.</p></div>
-        <div class="promise"><h4>🚫 No commissions, no pay-to-rank</h4><p>Agents and institutions can't pay for placement or better ratings. Reviews appear as submitted.</p></div>
-        <div class="promise"><h4>💳 Government fees go to the government</h4><p>Visa application charges are paid directly to Home Affairs via ImmiAccount. We never touch them.</p></div>
-        <div class="promise"><h4>🏷️ Two paid extras, clearly labelled</h4><p>An SOP review and a 1:1 session. That's the entire price list. Everything else is free.</p></div>
-        <div class="promise"><h4>⚖️ Know our limits</h4><p>We're an information platform, not a law firm. For formal advice, use a MARN agent (verify on OMARA) or a lawyer — our directory is free.</p></div>
+        <div class="promise"><h4>Honest feedback, even when it hurts</h4><p>If your case is weak, we say so and explain why — before you spend a cent or lodge anything.</p></div>
+        <div class="promise"><h4>Primary sources everywhere</h4><p>Every visa, fee and rule links to the official Home Affairs page so you can verify us in one click.</p></div>
+        <div class="promise"><h4>No commissions, no pay-to-rank</h4><p>Agents and institutions can't pay for placement or better ratings. Reviews appear as submitted.</p></div>
+        <div class="promise"><h4>Government fees go to the government</h4><p>Visa application charges are paid directly to Home Affairs via ImmiAccount. We never touch them.</p></div>
+        <div class="promise"><h4>Two paid extras, clearly labelled</h4><p>An SOP review and a 1:1 session. That's the entire price list. Everything else is free.</p></div>
+        <div class="promise"><h4>Know our limits</h4><p>We're an information platform, not a law firm. For formal advice, use a MARN agent (verify on OMARA) or a lawyer — our directory is free.</p></div>
       </div>
     </section>
 
     <!-- APPLY / CONTACT -->
     <section id="apply" class="section">
       <div class="section-head">
-        <h2>🚀 Start your application</h2>
+        <span class="eyebrow">Get started</span>
+        <h2>Start your application</h2>
         <p>Tell us your situation and we’ll point you to the right pathway. No payment needed to enquire.</p>
       </div>
       <div class="apply-wrap">
@@ -287,6 +298,7 @@
                 <option value="">Choose…</option>
                 <option value="offshore">Outside Australia</option>
                 <option value="onshore">Inside Australia</option>
+                <option value="flexible">I travel frequently — could be either</option>
               </select>
             </label>
           </div>
