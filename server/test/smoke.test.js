@@ -47,6 +47,19 @@ try {
   const onshore = await get('/api/visas?location=onshore');
   check('onshore filter works', onshore.body.visas.every((v) => v.location.includes('onshore')));
 
+  const flexible = await get('/api/visas?location=flexible');
+  check(
+    'flexible filter returns apply-from-anywhere visas only',
+    flexible.body.count > 5 &&
+      flexible.body.visas.every((v) => v.location.includes('onshore') && v.location.includes('offshore'))
+  );
+
+  const flexRec = await post('/api/eligibility', { answers: { goal: 'family', location: 'flexible', sponsor: 'partner' } });
+  check(
+    'flexible location recommends both partner streams',
+    ['820-801', '309-100'].every((c) => flexRec.body.recommendations.some((r) => r.code === c))
+  );
+
   const search = await get('/api/visas?q=student');
   check('search finds student visa', search.body.visas.some((v) => v.code === '500'));
 

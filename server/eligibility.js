@@ -30,6 +30,7 @@ export const questions = [
     options: [
       { value: 'offshore', label: 'Outside Australia' },
       { value: 'onshore', label: 'Inside Australia' },
+      { value: 'flexible', label: 'I travel a lot — could be either' },
     ],
   },
   {
@@ -104,7 +105,10 @@ export function recommend(a = {}) {
   if (goal === 'family') {
     if (sponsor === 'partner' || !sponsor) {
       if (loc === 'onshore') add('820-801', 8, 'Partner visa applied for in Australia');
-      else add('309-100', 8, 'Partner visa applied for outside Australia');
+      else if (loc === 'flexible') {
+        add('820-801', 6, 'Onshore partner stream — pick this if you’ll be in Australia when you apply');
+        add('309-100', 6, 'Offshore partner stream — pick this if you’ll be outside Australia when you apply');
+      } else add('309-100', 8, 'Partner visa applied for outside Australia');
       add('300', 3, 'If you intend to marry your Australian partner');
     }
     add('870', 3, 'Long-stay temporary option for parents');
@@ -133,6 +137,17 @@ export function recommend(a = {}) {
     } else {
       add('189', 5, 'Independent skilled PR');
       add('190', 4, 'State-nominated skilled PR');
+    }
+  }
+
+  // Flexible travellers: nudge toward visas that can be lodged from anywhere,
+  // so their recommendation isn't tied to where they happen to be that week.
+  if (loc === 'flexible') {
+    for (const code of [...scores.keys()]) {
+      const visa = findVisa(code);
+      if (visa && visa.location.includes('onshore') && visa.location.includes('offshore')) {
+        add(code, 1, 'Can be lodged whether you’re in or outside Australia');
+      }
     }
   }
 

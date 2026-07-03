@@ -97,7 +97,9 @@ function renderCatChips(categories) {
 
 function applyFilters() {
   state.filtered = state.visas.filter((v) => {
-    if (state.loc && !v.location.includes(state.loc)) return false;
+    if (state.loc === 'flexible') {
+      if (!(v.location.includes('onshore') && v.location.includes('offshore'))) return false;
+    } else if (state.loc && !v.location.includes(state.loc)) return false;
     if (state.cat && v.category !== state.cat) return false;
     if (state.q) {
       const hay = [v.code, v.name, v.summary, v.whoFor, v.category, ...(v.tags || [])].join(' ').toLowerCase();

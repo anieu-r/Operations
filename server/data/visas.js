@@ -1425,7 +1425,12 @@ export function findVisa(code) {
 
 export function filterVisas({ location, category, q } = {}) {
   let result = visas;
-  if (location) result = result.filter((v) => v.location.includes(location));
+  // 'flexible' = lodgeable from anywhere (both onshore AND offshore).
+  if (location === 'flexible') {
+    result = result.filter((v) => v.location.includes('onshore') && v.location.includes('offshore'));
+  } else if (location) {
+    result = result.filter((v) => v.location.includes(location));
+  }
   if (category) result = result.filter((v) => v.category === category);
   if (q) {
     const needle = q.toLowerCase();

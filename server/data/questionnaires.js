@@ -47,7 +47,7 @@ const CORE_SECTIONS = [
         id: 'inAustralia',
         label: 'Are you currently in Australia?',
         type: 'select',
-        options: YESNO,
+        options: ['Yes', 'No', 'I travel frequently between countries'],
         required: true,
       },
       {
