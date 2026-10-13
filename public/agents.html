@@ -1,24 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registered Migration Agents — AusWise Migration</title>
   <meta name="description" content="Find, review and rate MARN registered migration agents. Free directory — always verify agents on the official OMARA register." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;450;500;550;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+  <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
-<body>
+<body data-crumb="Migration agents">
   <div class="bg-decor" aria-hidden="true">
     <span class="blob blob-1"></span><span class="blob blob-2"></span>
     <span class="float-icon fi-2"></span><span class="float-icon fi-4"></span>
   </div>
 
   <header class="nav">
-    <a class="brand" href="/"><img class="brand-mark" src="/assets/logo.svg" alt="AusWise logo" width="36" height="36" /><span class="brand-name">Aus<span>Wise</span> Migration</span></a>
+    <a class="brand" href="/"><img class="brand-mark" src="/assets/logo.svg" alt="" width="36" height="36" /><span class="brand-name">Aus<span>Wise</span> Migration</span></a>
     <nav class="nav-links">
       <a href="/">Home</a>
       <a href="/#visas">Visas</a>
@@ -33,7 +31,7 @@
     <div class="page-hero">
       <span class="free-pill">Free directory · free reviews · no commissions</span>
       <h1>Registered migration agents</h1>
-      <p>Find a MARN agent, read real client reviews, and leave your own. Honesty first: MARNs here are format-checked, not auto-verified — <strong>always confirm an agent on the official OMARA register</strong> before engaging them.</p>
+      <p>Find a MARN agent, read client reviews, and leave your own. Honesty first: MARNs here are format-checked, not auto-verified — <strong>always confirm an agent on the official OMARA register</strong> before engaging them.</p>
       <a class="btn btn-ghost" id="omaraBtn" target="_blank" rel="noopener">Verify any agent on the OMARA register ↗</a>
     </div>
 
@@ -45,7 +43,7 @@
       <div class="chips" id="specialtyChips"></div>
       <p class="muted" id="agentNotice"></p>
       <div class="agent-grid" id="agentGrid"></div>
-      <p class="muted center" id="agentEmpty" hidden>No agents match that search.</p>
+      <p class="muted center" id="agentEmpty" hidden>No agents to show yet. Registered migration agents can <a href="#agent-login">list for free</a>.</p>
     </section>
 
     <!-- AGENT LOGIN / DASHBOARD -->
@@ -74,21 +72,23 @@
             <label>Specialties<select name="specialties" id="specialtySelect" multiple size="4"></select>
               <span class="fineprint">Hold Ctrl/Cmd to select several.</span></label>
             <label>Languages (comma separated)<input name="languages" placeholder="English, Hindi, Mandarin" /></label>
+            <label class="check"><input type="checkbox" name="acceptTerms" /> <span>I accept the <a href="/terms.html">Terms of Service</a> (including the agent terms) and the <a href="/privacy.html">Privacy Policy</a>. *</span></label>
+            <label class="check"><input type="checkbox" name="adultConfirm" /> <span>I am 18 or over and I am the registered migration agent named above. *</span></label>
           </div>
           <button class="btn btn-primary btn-block" type="submit" id="authSubmit">Log in</button>
-          <p class="fineprint">Passwords are stored hashed (scrypt). We list your name, MARN, bio and reviews publicly — never your email. New profiles appear immediately and honestly carry a “verify on OMARA” link like everyone else.</p>
+          <p class="fineprint">Passwords are stored hashed (scrypt). We publish your name, MARN, bio and reviews — never your email. Every profile carries a “verify on OMARA” link.</p>
         </form>
 
         <aside class="glass" style="padding: clamp(1.3rem,3vw,1.9rem)">
           <h3>Why list here?</h3>
           <ol class="steps">
             <li><b>Earn A$99 per client</b> — every one-on-one session booked with you pays the full A$99 to your bank account. We keep nothing.</li>
-            <li><b>Free forever</b> — no listing fees, no commissions, no pay-to-rank.</li>
-            <li><b>Real reviews</b> — clients rate you directly; we don’t edit or reorder them for money.</li>
-            <li><b>Qualified leads</b> — applicants arrive with a completed questionnaire and clear needs.</li>
+            <li><b>Free to list</b> — no listing fees, no commissions, no pay-to-rank.</li>
+            <li><b>Open reviews</b> — clients rate you directly; we don’t edit, hide or reorder them for money.</li>
+            <li><b>Informed enquiries</b> — applicants can share their completed questionnaire with you.</li>
           </ol>
           <div class="divider"></div>
-          <p class="fineprint">We show reviews as submitted (marked “unverified”) and flag example profiles clearly. We remove only unlawful content. That’s the deal — transparency both ways.</p>
+          <p class="fineprint">We show reviews as submitted (marked “unverified”) and remove only unlawful content. Reviewers must declare they were genuine clients, and agents cannot review themselves.</p>
         </aside>
       </div>
 
@@ -118,11 +118,15 @@
               <label>Account number<input name="accountNumber" required placeholder="5–10 digits" maxlength="10" /></label>
             </div>
             <button class="btn btn-primary" type="submit">Save payout details</button>
-            <p class="fineprint">Stored privately on the server and shown only to you, masked. Never displayed on your public profile. For a production deployment, connect a payment provider (e.g. Stripe Connect) — see the README.</p>
+            <p class="fineprint">Your BSB and account number are encrypted on our server and only ever shown back to you masked. They never appear on your public profile.</p>
           </form>
           <div class="divider"></div>
           <h4>Your reviews</h4>
           <div id="dashReviews" class="muted">—</div>
+          <div class="divider"></div>
+          <h4>Delete your account</h4>
+          <p class="fineprint">Permanently removes your account, public profile, reviews and payout details. This cannot be undone.</p>
+          <button class="btn btn-ghost" id="deleteAccountBtn" type="button">Delete my account</button>
         </div>
       </div>
     </section>
@@ -130,20 +134,21 @@
 
   <footer class="footer">
     <div class="disclaimer">
-      <p><strong>Transparency:</strong> AusWise verifies MARN <em>format</em> only. Registration status, sanctions and conditions must be checked on the official <a href="https://www.mara.gov.au/" target="_blank" rel="noopener">OMARA register</a>. Reviews are user-submitted and unverified. Example profiles are fictional and labelled. Only registered migration agents and Australian legal practitioners may lawfully provide immigration assistance for a fee.</p>
+      <p><strong>Transparency:</strong> AusWise verifies MARN <em>format</em> only. Registration status, sanctions and conditions must be checked on the official <a href="https://www.mara.gov.au/" target="_blank" rel="noopener">OMARA register</a>. Reviews are user-submitted and unverified. Only registered migration agents and Australian legal practitioners may lawfully provide immigration assistance for a fee.</p>
       <p class="muted">© <span id="year"></span> AusWise Migration.</p>
     </div>
   </footer>
 
   <div class="modal" id="agentModal" hidden>
     <div class="modal-backdrop" data-close></div>
-    <div class="modal-card glass" role="dialog" aria-modal="true">
+    <div class="modal-card glass" role="dialog" aria-modal="true" aria-labelledby="agentModalTitle">
       <button class="modal-close" data-close aria-label="Close">✕</button>
       <div id="agentModalBody"></div>
     </div>
   </div>
 
   <div class="toast" id="toast" hidden></div>
+  <script src="/js/site.js" type="module"></script>
   <script src="/js/agents.js" type="module"></script>
 </body>
 </html>

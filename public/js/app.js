@@ -1,5 +1,7 @@
 /* AusWise Migration — front-end controller (vanilla JS, no build step). */
 
+import { getOptional, setOptional } from './consent.js';
+
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
@@ -122,7 +124,6 @@ function renderVisaGrid() {
       return `<article class="visa-card" data-code="${esc(v.code)}" tabindex="0" role="button">
         <div class="vc-top">
           <span class="vc-code">Subclass ${esc(v.code)}</span>
-          ${v.popular ? '<span class="vc-pop">★ Popular</span>' : ''}
         </div>
         <div class="vc-name">${esc(v.name)}</div>
         <div class="vc-summary">${esc(v.summary)}</div>
@@ -162,10 +163,28 @@ function initModal() {
     if (e.key === 'Escape') closeModal();
   });
 }
+let lastFocus = null;
 function closeModal() {
+  if ($('#visaModal').hidden) return;
   $('#visaModal').hidden = true;
   document.body.style.overflow = '';
+  lastFocus?.focus?.();
 }
+// Keep keyboard focus inside the open dialog.
+document.addEventListener('keydown', (e) => {
+  const modal = $('#visaModal');
+  if (e.key !== 'Tab' || !modal || modal.hidden) return;
+  const items = $$('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])', modal);
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+});
 async function openVisaModal(code) {
   const { data } = await api(`/visas/${encodeURIComponent(code)}`);
   const v = data.visa;
@@ -197,9 +216,11 @@ async function openVisaModal(code) {
       <a class="btn btn-ghost" href="#apply" data-close>Ask a question first</a>
     </div>`;
   $$('[data-close]', $('#modalBody')).forEach((el) => el.addEventListener('click', closeModal));
+  lastFocus = document.activeElement;
   $('#visaModal').hidden = false;
   document.body.style.overflow = 'hidden';
   $('.modal-card').scrollTop = 0;
+  $('#visaModal .modal-close').focus();
 }
 
 /* ============================================================ visa finder */
@@ -297,7 +318,7 @@ function initSOP() {
 
   // Restore autosaved fields so nothing is lost on refresh.
   try {
-    const saved = JSON.parse(localStorage.getItem('auswise-sop') || '{}');
+    const saved = JSON.parse(getOptional('auswise-sop') || '{}');
     Object.entries(saved).forEach(([k, v]) => {
       if (form.elements[k]) form.elements[k].value = v;
     });
@@ -310,7 +331,7 @@ function initSOP() {
   let previewTimer = null;
   const schedulePreview = () => {
     const payload = Object.fromEntries(new FormData(form).entries());
-    localStorage.setItem('auswise-sop', JSON.stringify(payload));
+    setOptional('auswise-sop', JSON.stringify(payload)); // only with storage consent
     if (!payload.fullName) return; // preview needs at least a name
     clearTimeout(previewTimer);
     previewTimer = setTimeout(async () => {
@@ -378,82 +399,127 @@ function renderSOP(data, name, isPreview = false) {
 }
 
 /* ============================================================ VEVO */
+const VEVO_LABELS = {
+  entitlementCategory: 'Category checked',
+  visaSubclass: 'Visa subclass',
+  visaClass: 'Visa class',
+  visaStream: 'Stream',
+  visaType: 'Visa type',
+  visaStatus: 'Visa status',
+  visaDescription: 'Description',
+  visaGrantNumber: 'Grant number',
+  visaGrantDate: 'Grant date',
+  visaExpiryDate: 'Expiry date',
+  applicantRole: 'Applicant role',
+  location: 'Location',
+  visaHolderIsOnshore: 'Currently onshore',
+  workEntitlementStatus: 'Work entitlement',
+  studyEntitlementStatus: 'Study entitlement',
+  medicareEligibilityStatus: 'Medicare eligibility',
+  residenceStatus: 'Residence status',
+  immigrationStatus: 'Immigration status',
+  educationSector: 'Education sector',
+  entriesAllowed: 'Entries allowed',
+  periodOfStay: 'Period of stay',
+  enterBeforeDate: 'Must enter before',
+  mustNotArriveAfterDate: 'Must not arrive after',
+  latestArrivalDate: 'Latest arrival date',
+  initialStayDate: 'Initial stay date',
+  permanentResidentVisaApplicant: 'PR visa applicant',
+  permanentResidentLodgementDate: 'PR application lodged',
+  ministerialInterventionPending: 'Ministerial intervention pending',
+  ministerialInterventionCommencedDate: 'Ministerial intervention commenced',
+  travelDocumentId: 'Travel document',
+};
+const RAW_FIELDS = new Set(['visaClass', 'visaSubclass', 'travelDocumentId', 'visaGrantNumber']);
+const pretty = (k, v) => {
+  if (typeof v === 'boolean') return v ? 'Yes' : 'No';
+  if (RAW_FIELDS.has(k) || /^\d{4}-\d{2}-\d{2}$/.test(String(v))) return String(v);
+  if (k === 'entriesAllowed') return { M: 'Multiple', 1: 'Single', 0: 'None' }[v] || v;
+  if (k === 'periodOfStay') {
+    if (v === 'I') return 'Indefinite';
+    const m = String(v).match(/^([MY])(\d+)$/);
+    if (m) return `${m[2]} ${m[1] === 'M' ? 'months' : 'years'}`;
+  }
+  return String(v).replace(/_/g, ' ').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+};
+const humanCat = (c) => c.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (m) => m.toUpperCase());
+
 async function initVEVO() {
   const { data } = await api('/vevo/info');
   const modeEl = $('#vevoMode');
   const sel = $('#vevoCategory');
+  const live = data.mode === 'live';
   if (sel) {
     sel.innerHTML = (data.categories || [])
-      .map((c) => `<option value="${esc(c)}"${c === 'WORK_ENTITLEMENTS' ? ' selected' : ''}>${esc(label(c))}</option>`)
+      .map((c) => `<option value="${esc(c.id)}"${c.id === 'WORK_ENTITLEMENTS' ? ' selected' : ''}>${esc(humanCat(c.id))}</option>`)
       .join('');
   }
+  if ($('#vevoSelf')) $('#vevoSelf').href = data.source?.selfCheck || 'https://immi.homeaffairs.gov.au';
+  if (data.operatorRequired) $('#operatorField').hidden = false;
   if (modeEl) {
-    const live = data.mode === 'live';
     modeEl.className = `vevo-mode ${live ? 'live' : ''}`;
-    modeEl.innerHTML = `${live ? '🟢 Live VEVO connected' : '🟡 Demo mode'} — ${esc(data.notice || '')}`;
+    modeEl.textContent = `Contract v${data.version} · ${data.notice || ''}`;
   }
   const form = $('#vevoForm');
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = Object.fromEntries(new FormData(form).entries());
+    const holderConsent = form.elements.holderConsent.checked;
+    const operatorKey = fd.operatorKey || '';
+    delete fd.holderConsent;
+    delete fd.operatorKey;
     fd.travelDocumentIssuingCountry = (fd.travelDocumentIssuingCountry || '').toUpperCase();
     const btn = $('button[type=submit]', form);
     btn.disabled = true;
     btn.textContent = 'Checking…';
-    const { ok, data: res } = await api('/vevo/check', { method: 'POST', body: JSON.stringify({ data: fd }) });
+    const { ok, data: res } = await api('/vevo/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(operatorKey ? { 'x-operator-key': operatorKey } : {}) },
+      body: JSON.stringify({ data: fd, holderConsent }),
+    });
     btn.disabled = false;
-    btn.textContent = '🔍 Run entitlement check';
+    btn.textContent = 'Run entitlement check';
     if (!ok) {
-      const msg = res.errors?.[0]?.detail || res.error || 'Check failed.';
-      toast(msg, 'err');
+      toast(res.hint || res.errors?.[0]?.detail || res.error || 'Check failed.', 'err');
       renderVevoErrors(res.errors);
       return;
     }
     renderVevo(res);
   });
-
-  function label(c) {
-    return c.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (m) => m.toUpperCase());
-  }
 }
 function renderVevoErrors(errors) {
   if (!errors?.length) return;
-  $('#vevoOutput').innerHTML = `<div class="m-section"><h4>Please fix:</h4><ul class="m-list">${errors
-    .map((e) => `<li>${esc(e.detail)}</li>`)
+  $('#vevoOutput').innerHTML = `<div class="m-section"><h3>Please fix:</h3><ul class="m-list">${errors
+    .map((e) => `<li>${esc(e.detail)}${e.code ? ` <span class="muted">(${esc(e.code)})</span>` : ''}</li>`)
     .join('')}</ul></div>`;
 }
 function renderVevo(res) {
   const d = res.data || {};
-  const out = $('#vevoOutput');
-  const item = (label, val) => (val ? `<div class="ent-item"><span>${esc(label)}</span><b>${esc(val)}</b></div>` : '');
+  const skip = new Set(['givenName', 'familyName', 'currentTimestamp', 'workConditions', 'studyConditions', 'visaConditions']);
+  const items = Object.entries(d)
+    .filter(([k, v]) => !skip.has(k) && v !== '' && v != null)
+    .map(([k, v]) => `<div class="ent-item"><span>${esc(VEVO_LABELS[k] || k)}</span><b>${esc(pretty(k, v))}</b></div>`)
+    .join('');
   const conds = (title, list) =>
     list && list.length
-      ? `<div class="m-section"><h4>${esc(title)}</h4>${list
-          .map((c) => `<div class="cond"><b>Condition ${esc(c.conditionCode)}</b><p>${esc(c.conditionDescription)}</p></div>`)
+      ? `<div class="m-section"><h3>${esc(title)}</h3>${list
+          .map((c) => `<div class="cond"><b>Condition ${esc(c.conditionCode)}</b><p>${esc(pretty('', c.conditionDescription))}</p></div>`)
           .join('')}</div>`
       : '';
-  out.innerHTML = `
-    ${res.mode === 'demo' ? `<div class="demo-banner">⚠️ ${esc(res.notice || 'Simulated result — not live government data.')}</div>` : ''}
+  const rl = res.rateLimit ? ` · quota ${res.rateLimit.remaining ?? '?'} of ${res.rateLimit.limit ?? '?'} left today` : '';
+  $('#vevoOutput').innerHTML = `
+    ${res.mode === 'demo' ? `<div class="demo-banner">${esc(res.notice || 'Simulated result — not live government data.')}</div>` : ''}
     <div class="ent-card">
       <div class="ent-head">
-        <span class="ent-name">${esc(d.givenName ? d.givenName + ' ' : '')}${esc(d.familyName || '')}</span>
-        ${d.visaStatus ? `<span class="ent-status">${esc(d.visaStatus.replace(/_/g, ' '))}</span>` : ''}
+        <span class="ent-name">${esc([d.givenName, d.familyName].filter(Boolean).join(' '))}</span>
+        ${d.visaStatus ? `<span class="ent-status">${esc(pretty('', d.visaStatus))}</span>` : ''}
       </div>
-      <div class="ent-grid">
-        ${item('Visa', d.visaType ? `${d.visaType} (${d.visaSubclass || d.visaClass || ''})` : d.visaClass)}
-        ${item('Applicant role', d.applicantRole)}
-        ${item('Currently onshore', d.visaHolderIsOnshore == null ? '' : d.visaHolderIsOnshore ? 'Yes' : 'No')}
-        ${item('Work entitlement', d.workEntitlement && d.workEntitlement.replace(/_/g, ' '))}
-        ${item('Grant date', d.grantDate)}
-        ${item('Visa expiry', d.visaExpiryDate)}
-        ${item('Must enter before', d.enterBeforeDate)}
-        ${item('Medicare', d.medicareEligibilityStatus && d.medicareEligibilityStatus.replace(/_/g, ' '))}
-        ${item('Residence', d.residenceStatus)}
-        ${item('Education sector', d.educationSector && d.educationSector.replace(/_/g, ' '))}
-      </div>
+      <div class="ent-grid">${items}</div>
       ${conds('Work conditions', d.workConditions)}
       ${conds('Study conditions', d.studyConditions)}
-      <p class="fineprint">Category checked: ${esc((res.requestedCategory || '').replace(/_/g, ' '))} · ${esc(res.checkedAt || '')}</p>
+      ${conds('Visa conditions', d.visaConditions)}
+      <p class="fineprint">${esc(res.mode === 'live' ? 'Live' : 'Demo')} · contract v${esc(res.version || '')} · ${esc(res.checkedAt || '')}${esc(rl)}</p>
     </div>`;
 }
 
@@ -525,14 +591,14 @@ async function loadServices() {
     banner.classList.toggle('on', !!enabled);
   }
   $('#payFootnote').textContent = data.note || '';
+  if ($('#priceNote')) $('#priceNote').textContent = data.priceNote || '';
   grid.innerHTML = (data.services || [])
     .map(
-      (s) => `<article class="service-card ${s.popular ? 'pop' : ''}">
-        ${s.popular ? '<span class="svc-badge">Most popular</span>' : ''}
+      (s) => `<article class="service-card">
         <h4>${esc(s.name)}</h4>
         <div class="svc-price">${esc(s.display)}</div>
         <p class="svc-desc">${esc(s.description)}</p>
-        <button class="btn ${s.popular ? 'btn-primary' : 'btn-ghost'} svc-buy" data-id="${esc(s.id)}" data-name="${esc(s.name)}">
+        <button class="btn btn-primary svc-buy" data-id="${esc(s.id)}" data-name="${esc(s.name)}">
           ${enabled ? 'Book &amp; pay' : 'Enquire'}
         </button>
       </article>`
@@ -575,7 +641,7 @@ function goEnquire(serviceName) {
 function handlePaymentReturn() {
   const params = new URLSearchParams(window.location.search);
   const pay = params.get('pay');
-  if (pay === 'success') toast('✅ Payment received — thank you! Check your email for a receipt.', 'ok');
+  if (pay === 'success') toast('Payment received — thank you. Stripe will email your receipt.', 'ok');
   else if (pay === 'cancel') toast('Checkout cancelled — no charge was made.', 'err');
   if (pay) {
     params.delete('pay');
@@ -587,8 +653,8 @@ function handlePaymentReturn() {
 
 /* ============================================================ forms */
 function initForms() {
-  bindForm('#applyForm', '/applications', '🚀 Send my enquiry', (data) =>
-    `Thanks! Reference ${data.reference}. ${data.message}`
+  bindForm('#applyForm', '/applications', 'Send my enquiry', (data) =>
+    `Reference ${data.reference}. ${data.message}`
   );
   bindForm('#contactForm', '/contact', 'Send message', (data) => `Sent! Ref ${data.reference}. We’ll reply by email.`);
 }
@@ -598,6 +664,8 @@ function bindForm(sel, endpoint, resetLabel, successMsg) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = Object.fromEntries(new FormData(form).entries());
+    // Checkboxes are sent as real booleans (consents must be explicitly true).
+    $$('input[type=checkbox]', form).forEach((c) => (payload[c.name] = c.checked));
     const btn = $('button[type=submit]', form);
     const orig = btn.textContent;
     btn.disabled = true;

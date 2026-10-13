@@ -1,5 +1,8 @@
 /* AusWise — per-visa application questionnaire wizard.
-   Autosaves to localStorage so applicants can leave and resume. */
+   With the visitor's storage consent, drafts are saved in this browser so
+   applicants can leave and resume. */
+
+import { getOptional, setOptional, removeOptional, canStoreOptional } from './consent.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -51,7 +54,7 @@ async function start(visaCode) {
   state.questionnaire = data.questionnaire;
   state.step = 0;
   try {
-    state.answers = JSON.parse(localStorage.getItem(saveKey()) || '{}');
+    state.answers = JSON.parse(getOptional(saveKey()) || '{}');
   } catch {
     state.answers = {};
   }
@@ -59,6 +62,18 @@ async function start(visaCode) {
   $('#wizard').hidden = false;
   if (Object.keys(state.answers).length) toast('Welcome back — your earlier answers were restored.', 'ok');
   renderStep();
+}
+
+// Applicants under 18 need a parent/guardian's details and consent.
+function deriveAge() {
+  const dob = state.answers.dob;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dob || '')) return (state.answers.under18 = false);
+  const b = new Date(`${dob}T00:00:00Z`);
+  const now = new Date();
+  let age = now.getUTCFullYear() - b.getUTCFullYear();
+  const m = now.getUTCMonth() - b.getUTCMonth();
+  if (m < 0 || (m === 0 && now.getUTCDate() < b.getUTCDate())) age--;
+  state.answers.under18 = age < 18;
 }
 
 function visibleFields(section) {
@@ -94,7 +109,8 @@ function renderStep() {
   $('#wizBody').innerHTML = `
     <p class="muted">${esc(q.visaName)} (subclass ${esc(q.visaCode)}) · about ${q.estimatedMinutes} minutes total</p>
     ${state.step === 0 ? `<div class="honest-box"><b>Before you start:</b> ${esc(q.intro)}</div>` : ''}
-    <div class="wiz-section-title">${esc(section.title)}</div>
+    <h2 class="wiz-section-title" id="wizTitle" tabindex="-1">${esc(section.title)}</h2>
+    ${!canStoreOptional() && state.step === 0 ? '<p class="fineprint">Drafts are not being saved on this device. To resume later, choose “Allow saving drafts” in Storage settings (page footer).</p>' : ''}
     <form id="wizForm">${visibleFields(section).map(fieldHtml).join('')}</form>
     <div class="wiz-nav">
       ${state.step > 0 ? '<button class="btn btn-ghost" id="wizBack">← Back</button>' : '<span></span>'}
@@ -108,7 +124,11 @@ function renderStep() {
     el.addEventListener('change', () => {
       capture(el);
       const section = state.questionnaire.sections[state.step];
-      if (section.fields.some((f) => f.showIf)) renderStep();
+      if (section.fields.some((f) => f.showIf)) {
+        const id = el.dataset.f;
+        renderStep();
+        $(`#wizForm [data-f="${id}"]`)?.focus();
+      }
     });
   });
   $('#wizBack')?.addEventListener('click', () => {
@@ -122,7 +142,8 @@ function renderStep() {
 function capture(el) {
   const id = el.dataset.f;
   state.answers[id] = el.type === 'checkbox' ? el.checked : el.value;
-  localStorage.setItem(saveKey(), JSON.stringify(state.answers));
+  if (id === 'dob') deriveAge();
+  setOptional(saveKey(), JSON.stringify(state.answers)); // no-op without storage consent
 }
 
 function next() {
@@ -168,7 +189,7 @@ async function submit() {
     renderStep();
     return;
   }
-  localStorage.removeItem(saveKey());
+  removeOptional(saveKey());
   $('#wizBody').innerHTML = `
     <div class="wiz-done">
       <span class="big-emoji"></span>
@@ -177,9 +198,10 @@ async function submit() {
       <div class="honest-box">
         <b>What happens next (and what it costs):</b>
         <ul>
-          <li><b>Free:</b> we review your answers and reply by email with honest next steps — including anything that could hurt your application. No sales pitch.</li>
-          <li><b>Free:</b> your tailored document checklist and official links for lodging in ImmiAccount.</li>
-          <li><b>Optional, paid:</b> an expert SOP review, or a one-on-one session if you want to go deep. Only pay if you want them.</li>
+          <li><b>Free:</b> we reply by email with general information about your visa and the official document checklist.</li>
+          <li><b>Free:</b> if you want personal advice, we can introduce you to a registered migration agent — you choose whether to go ahead.</li>
+          <li><b>Optional, paid:</b> an SOP review (A$79) or a one-on-one session (A$99) with a registered migration agent. Only if you want them.</li>
+          <li><b>Your data:</b> keep your reference — with it and your email you can <a href="/data-requests.html">delete your answers</a> at any time.</li>
           <li><b>Never:</b> government visa charges through us — those always go directly to Home Affairs.</li>
         </ul>
       </div>
@@ -194,6 +216,7 @@ async function submit() {
 
 function scrollTop() {
   $('#wizard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('#wizTitle')?.focus({ preventScroll: true });
 }
 
 /* scroll reveal — sections fade in as they enter the viewport */

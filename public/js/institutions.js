@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('#partnerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = Object.fromEntries(new FormData(e.target).entries());
+    fd.privacyConsent = e.target.elements.privacyConsent.checked;
     const btn = $('#partnerForm button[type=submit]');
     btn.disabled = true;
     const { ok, data: res } = await api('/institutions/enquiry', { method: 'POST', body: JSON.stringify(fd) });

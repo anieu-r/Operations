@@ -5,12 +5,14 @@
  * - MARNs are format-validated (7 digits) but NOT auto-verified against OMARA —
  *   there is no public verification API. Every profile therefore carries a
  *   "verify on the official register" link, and the UI says so plainly.
- * - Seed profiles are FICTIONAL examples, flagged `demo: true`, and labelled
- *   "Example profile" in the UI so nobody mistakes them for real agents.
- * - Reviews are open (no account needed) and labelled "unverified reviews".
+ * - No fictional profiles or sample reviews are ever seeded; any left over
+ *   from earlier versions are purged at startup (purgeDemoContent).
+ * - Reviews are open (no account needed), labelled "unverified", require a
+ *   genuine-client declaration, and agents cannot review themselves.
  */
 
-import { all, insert, findOne, update } from './store.js';
+import { all, insert, findOne, update, removeWhere } from './store.js';
+import { encrypt, canEncrypt } from './privacy.js';
 import { hashPassword, verifyPassword, issueToken, resolveToken, revokeToken, newId } from './auth.js';
 
 export const OMARA_SEARCH_URL = 'https://portal.mara.gov.au/search-the-register-of-migration-agents/';
@@ -25,7 +27,7 @@ export const PAYOUT_PROGRAM = {
   amountCents: 9900,
   display: 'A$99',
   description:
-    'You receive the full A$99 for every one-on-one client session booked with you through AusWise. The platform keeps nothing. Payouts are transferred to your nominated bank account after each delivered session.',
+    'You receive the full A$99 for every one-on-one client session booked with you through AusWise. The platform keeps nothing. Payouts go to your nominated bank account after each delivered session, as set out in the Terms of Service.',
 };
 
 export const SPECIALTIES = [
@@ -41,58 +43,16 @@ export const SPECIALTIES = [
 
 const MARN_RE = /^\d{7}$/;
 
-/* --------------------------------------------------------- demo seed data */
-const DEMO_AGENTS = [
-  {
-    name: 'Sarah Nguyen (Example profile)',
-    marn: '0000001',
-    bio: 'Fictional example agent shown while the directory is new. 12+ years in skilled and employer-sponsored migration. Real agents can register and replace these examples.',
-    specialties: ['Skilled & points-tested', 'Employer sponsored'],
-    languages: ['English', 'Vietnamese'],
-    location: 'Melbourne, VIC',
-  },
-  {
-    name: 'Daniel Okafor (Example profile)',
-    marn: '0000002',
-    bio: 'Fictional example agent. Focused on student visas and graduate pathways, including Genuine Student statements and appeals.',
-    specialties: ['Student visas', 'Appeals & reviews (ART)'],
-    languages: ['English'],
-    location: 'Brisbane, QLD',
-  },
-  {
-    name: 'Mei-Lin Chow (Example profile)',
-    marn: '0000003',
-    bio: 'Fictional example agent. Partner, family and parent visas, with a focus on relationship evidence and complex cases.',
-    specialties: ['Partner & family', 'Visitor visas'],
-    languages: ['English', 'Mandarin', 'Cantonese'],
-    location: 'Sydney, NSW',
-  },
-];
-
-const DEMO_REVIEWS = [
-  { marn: '0000001', rating: 5, name: 'Demo review', comment: 'Example review — clear advice on my 482 → 186 pathway. (Sample data)' },
-  { marn: '0000001', rating: 4, name: 'Demo review', comment: 'Example review — responsive and honest about my chances. (Sample data)' },
-  { marn: '0000002', rating: 5, name: 'Demo review', comment: 'Example review — helped my GS statement enormously. (Sample data)' },
-  { marn: '0000003', rating: 4, name: 'Demo review', comment: 'Example review — great with our partner evidence. (Sample data)' },
-];
-
-/** Seed demo profiles once (idempotent). */
-export function seedDemoAgents() {
-  for (const demo of DEMO_AGENTS) {
-    if (!findOne('agents', { marn: demo.marn })) {
-      const row = insert('agents', {
-        agentId: newId(),
-        ...demo,
-        email: null,
-        passwordHash: null,
-        demo: true,
-        approved: true,
-      });
-      for (const r of DEMO_REVIEWS.filter((x) => x.marn === demo.marn)) {
-        insert('reviews', { agentId: row.agentId, rating: r.rating, name: r.name, comment: r.comment, demo: true });
-      }
-    }
+/* --------------------------------------------------------- legacy cleanup */
+/** Remove fictional example agents and sample reviews seeded by older versions. */
+export function purgeDemoContent() {
+  const demoIds = all('agents').filter((a) => a.demo).map((a) => a.agentId);
+  let removed = removeWhere('reviews', { demo: true });
+  for (const agentId of demoIds) {
+    removed += removeWhere('reviews', { agentId });
+    removed += removeWhere('agents', { agentId });
   }
+  return removed;
 }
 
 /* --------------------------------------------------------- helpers */
@@ -107,7 +67,6 @@ function publicAgent(a) {
     specialties: a.specialties || [],
     languages: a.languages || [],
     location: a.location || '',
-    demo: Boolean(a.demo),
     rating: avg ? Math.round(avg * 10) / 10 : null,
     reviewCount: reviews.length,
     omaraVerifyUrl: OMARA_SEARCH_URL,
@@ -143,13 +102,12 @@ export function getAgent(agentId) {
       rating: r.rating,
       name: r.name || 'Anonymous',
       comment: r.comment || '',
-      demo: Boolean(r.demo),
       createdAt: r.createdAt,
     }));
   return { ...profile, reviews };
 }
 
-export function registerAgent({ name, marn, email, password, bio, specialties, languages, location }) {
+export function registerAgent({ name, marn, email, password, bio, specialties, languages, location, consent }) {
   if (!name) return { error: 'Please enter your name.' };
   if (!MARN_RE.test(marn || '')) return { error: 'MARN must be a 7-digit number (as shown on the OMARA register).' };
   if (!email) return { error: 'Please enter your email.' };
@@ -167,8 +125,8 @@ export function registerAgent({ name, marn, email, password, bio, specialties, l
     specialties: (Array.isArray(specialties) ? specialties : []).filter((s) => SPECIALTIES.includes(s)),
     languages: (Array.isArray(languages) ? languages : []).map((l) => String(l).slice(0, 40)).slice(0, 8),
     location: String(location || '').slice(0, 120),
-    demo: false,
     approved: true,
+    consent,
   });
   const token = issueToken(row.agentId);
   return { agent: publicAgent(row), token };
@@ -180,7 +138,7 @@ export function loginAgent({ email, marn, password }) {
     : marn
       ? findOne('agents', { marn })
       : null;
-  if (!agent || agent.demo || !verifyPassword(password || '', agent.passwordHash)) {
+  if (!agent || !verifyPassword(password || '', agent.passwordHash)) {
     return { error: 'Invalid credentials. Check your email/MARN and password.' };
   }
   return { agent: publicAgent(agent), token: issueToken(agent.agentId) };
@@ -192,8 +150,8 @@ function maskedPayout(a) {
   return {
     set: true,
     accountName: a.payout.accountName,
-    bsb: a.payout.bsb.replace(/^(\d{3})(\d{3})$/, '$1-$2'),
-    accountNumberMasked: '•'.repeat(Math.max(0, a.payout.accountNumber.length - 3)) + a.payout.accountNumber.slice(-3),
+    bsb: a.payout.bsbMasked,
+    accountNumberMasked: a.payout.accountMasked,
     updatedAt: a.payout.updatedAt,
   };
 }
@@ -207,10 +165,10 @@ export function agentFromToken(token) {
 }
 
 /**
- * Attach payout bank details to the logged-in agent. Details are never exposed
- * publicly and are returned masked. NOTE for production: move to a payment
- * provider (e.g. Stripe Connect) and encrypt at rest — the bundled JSON store
- * is demo-grade and stores what you give it.
+ * Attach payout bank details to the logged-in agent. The BSB and account
+ * number are encrypted at rest (AES-256-GCM, DATA_ENCRYPTION_KEY); only
+ * masked forms are stored in clear and returned. Without a key configured the
+ * details are refused rather than stored in plain text.
  */
 export function setPayoutDetails(token, { accountName, bsb, accountNumber } = {}) {
   const agentId = resolveToken(token);
@@ -221,11 +179,16 @@ export function setPayoutDetails(token, { accountName, bsb, accountNumber } = {}
   if (!name) return { error: 'Please enter the account holder name.' };
   if (!/^\d{6}$/.test(bsbDigits)) return { error: 'BSB must be 6 digits (e.g. 062-000).' };
   if (!/^\d{5,10}$/.test(accDigits)) return { error: 'Account number must be 5–10 digits.' };
-  const row = update(
-    'agents',
-    { agentId },
-    { payout: { accountName: name, bsb: bsbDigits, accountNumber: accDigits, updatedAt: new Date().toISOString() } }
-  );
+  if (!canEncrypt()) return { error: 'Payout storage is not enabled on this server.', code: 'NO_KEY' };
+  const row = update('agents', { agentId }, {
+    payout: {
+      accountName: name,
+      bsbMasked: `${bsbDigits.slice(0, 3)}-•••`,
+      accountMasked: '•'.repeat(accDigits.length - 3) + accDigits.slice(-3),
+      encrypted: encrypt({ bsb: bsbDigits, accountNumber: accDigits }),
+      updatedAt: new Date().toISOString(),
+    },
+  });
   if (!row) return { error: 'Account not found.' };
   return { payout: maskedPayout(row), payoutProgram: PAYOUT_PROGRAM };
 }
@@ -242,14 +205,25 @@ export function updateAgentProfile(token, patch) {
   return row ? { agent: publicAgent(row) } : { error: 'Account not found.' };
 }
 
+/** Permanently delete the logged-in agent's account, sessions and reviews. */
+export function deleteAgentAccount(token) {
+  const agentId = resolveToken(token);
+  if (!agentId) return { error: 'Not logged in.' };
+  removeWhere('reviews', { agentId });
+  removeWhere('sessions', { agentId });
+  removeWhere('agents', { agentId });
+  return { ok: true };
+}
+
 export function logoutAgent(token) {
   revokeToken(token);
   return { ok: true };
 }
 
-export function addReview(agentId, { rating, name, comment }) {
+export function addReview(agentId, { rating, name, comment, reviewerToken }) {
   const agent = findOne('agents', { agentId });
   if (!agent || agent.approved === false) return { error: 'Agent not found.' };
+  if (reviewerToken && resolveToken(reviewerToken) === agentId) return { error: 'Agents cannot review their own profile.' };
   const r = Math.round(Number(rating));
   if (!(r >= 1 && r <= 5)) return { error: 'Rating must be between 1 and 5.' };
   const row = insert('reviews', {
@@ -257,7 +231,6 @@ export function addReview(agentId, { rating, name, comment }) {
     rating: r,
     name: String(name || 'Anonymous').slice(0, 80),
     comment: String(comment || '').slice(0, 1500),
-    demo: false,
   });
   return { review: { rating: row.rating, name: row.name, comment: row.comment, createdAt: row.createdAt } };
 }

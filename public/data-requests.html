@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your data & deletion — AusWise Migration</title>
+  <meta name="description" content="Delete your enquiry or questionnaire instantly, request a copy or correction of your data, or clear data saved on this device." />
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+  <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body data-crumb="Your data">
+  <header class="nav">
+    <a class="brand" href="/"><img class="brand-mark" src="/assets/logo.svg" alt="" width="36" height="36" /><span class="brand-name">Aus<span>Wise</span> Migration</span></a>
+    <nav class="nav-links"></nav>
+    <button class="nav-toggle" aria-label="Open menu">☰</button>
+  </header>
+
+  <main class="legal">
+    <h1>Your data & deletion</h1>
+    <p class="meta">Last updated 13 October 2026 · Policy version <span data-biz="policyVersion"></span></p>
+
+    <p>You are in control of your information. Most requests take a few seconds and need no email back-and-forth.</p>
+
+    <h2 id="delete">1. Delete an enquiry or questionnaire — instantly</h2>
+    <p>Enter the reference number you received and the email you used. Both must match, so nobody else can delete your data.</p>
+    <form id="deleteForm" class="glass" style="padding:1.4rem">
+      <div class="grid-2">
+        <label>Reference number *<input name="reference" required placeholder="e.g. QNR-ABC12XYZ" autocomplete="off" /></label>
+        <label>Email used *<input name="email" type="email" required autocomplete="email" /></label>
+      </div>
+      <button class="btn btn-primary" type="submit">Permanently delete</button>
+      <p class="fineprint" id="deleteResult" role="status"></p>
+    </form>
+
+    <h2 id="request">2. Other privacy requests</h2>
+    <p>Ask for a copy of your data, a correction, deletion of anything not covered above, or make a privacy complaint. We respond within 30 days.</p>
+    <form id="requestForm" class="glass" style="padding:1.4rem">
+      <div class="grid-2">
+        <label>Request type *
+          <select name="type" required>
+            <option value="">Choose…</option>
+            <option value="access">Send me a copy of my data</option>
+            <option value="correction">Correct my data</option>
+            <option value="deletion">Delete my data</option>
+            <option value="complaint">Privacy complaint</option>
+          </select></label>
+        <label>Your email *<input name="email" type="email" required autocomplete="email" /></label>
+      </div>
+      <label>Reference number (if you have one)<input name="reference" autocomplete="off" /></label>
+      <label>Details<textarea name="details" rows="3" placeholder="Tell us what you need"></textarea></label>
+      <button class="btn btn-primary" type="submit">Send request</button>
+      <p class="fineprint" id="requestResult" role="status"></p>
+    </form>
+
+    <h2 id="agents">3. Agent accounts</h2>
+    <p>Log in on the <a href="/agents.html#agent-login">agent portal</a> and choose <strong>Delete my account</strong>. Your profile, reviews and payout details are removed immediately.</p>
+
+    <h2 id="email">4. Emails</h2>
+    <p>Every email we send to applicants has a one-click unsubscribe link. Once you unsubscribe, we won’t email you again.</p>
+
+    <h2 id="device">5. Data saved on this device</h2>
+    <p>Remove any drafts and settings this site saved in your browser.</p>
+    <button class="btn btn-ghost" id="clearDevice" type="button">Clear data on this device</button>
+    <p class="fineprint" id="clearResult" role="status"></p>
+
+    <h2>6. Not satisfied?</h2>
+    <p>You can complain to the <a href="https://www.oaic.gov.au/privacy/privacy-complaints" target="_blank" rel="noopener">Office of the Australian Information Commissioner ↗</a>.</p>
+
+  </main>
+
+  <footer class="footer">
+    <div class="disclaimer">
+      <p>AusWise Migration provides general information and self-help tools. It is not a government agency and does not provide immigration assistance, legal advice or migration advice.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" hidden></div>
+  <script src="/js/site.js" type="module"></script>
+  <script src="/js/legal.js" type="module"></script>
+</body>
+</html>

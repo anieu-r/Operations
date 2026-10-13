@@ -1,24 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Universities & Colleges — AusWise Migration</title>
   <meta name="description" content="Explore Australian universities and TAFE providers with factual, commission-free listings. Institutions can register to manage their listing." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;450;500;550;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+  <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
-<body>
+<body data-crumb="Universities & colleges">
   <div class="bg-decor" aria-hidden="true">
     <span class="blob blob-2"></span><span class="blob blob-3"></span>
     <span class="float-icon fi-2"></span><span class="float-icon fi-4"></span>
   </div>
 
   <header class="nav">
-    <a class="brand" href="/"><img class="brand-mark" src="/assets/logo.svg" alt="AusWise logo" width="36" height="36" /><span class="brand-name">Aus<span>Wise</span> Migration</span></a>
+    <a class="brand" href="/"><img class="brand-mark" src="/assets/logo.svg" alt="" width="36" height="36" /><span class="brand-name">Aus<span>Wise</span> Migration</span></a>
     <nav class="nav-links">
       <a href="/">Home</a>
       <a href="/#visas">Visas</a>
@@ -69,6 +67,7 @@
           </div>
           <label>CRICOS provider code (if registered)<input name="cricosCode" placeholder="e.g. 00123A" /></label>
           <label>Tell us about your institution<textarea name="message" rows="3" placeholder="Sector, campuses, popular courses for international students…"></textarea></label>
+          <label class="check"><input type="checkbox" name="privacyConsent" /> <span>I agree to the <a href="/privacy.html">Privacy Policy</a> and to AusWise contacting me about this listing. *</span></label>
           <button class="btn btn-primary btn-lg" type="submit">Register interest — free</button>
           <p class="fineprint">We verify CRICOS registration before listing course information. We never charge students for introductions and never rank providers for money.</p>
         </form>
@@ -95,6 +94,7 @@
   </footer>
 
   <div class="toast" id="toast" hidden></div>
+  <script src="/js/site.js" type="module"></script>
   <script src="/js/institutions.js" type="module"></script>
 </body>
 </html>

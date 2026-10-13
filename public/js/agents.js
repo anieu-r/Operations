@@ -91,7 +91,6 @@ function renderAgents() {
           <div class="agent-name">${esc(a.name)}</div>
           <div class="agent-marn">MARN ${esc(a.marn)} · <a href="${esc(a.omaraVerifyUrl)}" target="_blank" rel="noopener">verify ↗</a></div>
         </div>
-        ${a.demo ? '<span class="demo-flag">Example profile</span>' : ''}
       </div>
       <div>${stars(a.rating)} <b>${a.rating ?? '—'}</b> <span class="muted">(${a.reviewCount} review${a.reviewCount === 1 ? '' : 's'})</span></div>
       <p class="agent-bio">${esc(a.bio)}</p>
@@ -114,9 +113,12 @@ function initModal() {
   $$('#agentModal [data-close]').forEach((el) => el.addEventListener('click', closeModal));
   document.addEventListener('keydown', (e) => e.key === 'Escape' && closeModal());
 }
+let lastFocus = null;
 function closeModal() {
+  if ($('#agentModal').hidden) return;
   $('#agentModal').hidden = true;
   document.body.style.overflow = '';
+  lastFocus?.focus?.();
 }
 
 async function openAgent(id, focusReview) {
@@ -124,48 +126,52 @@ async function openAgent(id, focusReview) {
   if (!ok) return toast('Could not load that agent.', 'err');
   const a = data.agent;
   $('#agentModalBody').innerHTML = `
-    <h3>${esc(a.name)} ${a.demo ? '<span class="demo-flag">Example profile</span>' : ''}</h3>
+    <h2 id="agentModalTitle">${esc(a.name)}</h2>
     <p class="m-sub">MARN ${esc(a.marn)} · <a href="${esc(a.omaraVerifyUrl)}" target="_blank" rel="noopener">verify on OMARA ↗</a> ${a.location ? `· ${esc(a.location)}` : ''}</p>
     <div>${stars(a.rating)} <b>${a.rating ?? '—'}</b> <span class="muted">(${a.reviewCount})</span></div>
     <p>${esc(a.bio)}</p>
     <div class="m-badges">${a.specialties.map((s) => `<span class="tag">${esc(s)}</span>`).join('')}</div>
 
     <div class="m-section">
-      <h4>Leave a review</h4>
+      <h3>Leave a review</h3>
       <form id="reviewForm">
-        <div class="rate-input" id="rateInput">${[1, 2, 3, 4, 5].map((n) => `<span data-v="${n}">★</span>`).join('')}</div>
-        <input type="hidden" name="rating" value="0" />
+        <fieldset class="rate-group">
+          <legend>Your rating *</legend>
+          <div class="rate-input" id="rateInput">${[1, 2, 3, 4, 5]
+            .map((n) => `<input type="radio" name="rating" id="r${n}" value="${n}" /><label for="r${n}" data-v="${n}" title="${n} star${n > 1 ? 's' : ''}">★<span class="sr-only">${n} star${n > 1 ? 's' : ''}</span></label>`)
+            .join('')}</div>
+        </fieldset>
         <div class="grid-2">
           <label>Your name (or leave blank)<input name="name" placeholder="Anonymous" /></label>
         </div>
         <label>Your experience<textarea name="comment" rows="2" placeholder="Honest, specific feedback helps others most"></textarea></label>
+        <label class="check"><input type="checkbox" name="genuineClient" /> <span>I was a client of this agent and this review reflects my genuine experience. I have no connection to the agent and was not paid or rewarded for it. *</span></label>
         <button class="btn btn-primary" type="submit">Submit review</button>
-        <p class="fineprint">Reviews are public and unverified. Be truthful — reviews you wouldn’t stand behind help no one.</p>
+        <p class="fineprint">Reviews are public, unverified and shown exactly as submitted — we don’t remove negative reviews, only unlawful content. Don’t include other people’s personal details. Your name is optional.</p>
       </form>
     </div>
 
-    <div class="m-section"><h4>Reviews (${a.reviews.length})</h4>
+    <div class="m-section"><h3>Reviews (${a.reviews.length}, newest first)</h3>
       ${a.reviews.length ? a.reviews.map((r) => `
         <div class="review">
-          <div class="r-head"><span>${stars(r.rating)} <b>${esc(r.name)}</b> ${r.demo ? '<span class="demo-flag">Sample</span>' : ''}</span>
+          <div class="r-head"><span>${stars(r.rating)} <b>${esc(r.name)}</b></span>
           <span class="muted">${new Date(r.createdAt).toLocaleDateString('en-AU')}</span></div>
           <p>${esc(r.comment)}</p>
         </div>`).join('') : '<p class="muted">No reviews yet — be the first.</p>'}
     </div>`;
 
-  // star picker
-  const rate = $('#rateInput');
-  rate.addEventListener('click', (e) => {
-    const v = Number(e.target.dataset?.v || 0);
-    if (!v) return;
-    $('#reviewForm [name=rating]').value = v;
-    $$('#rateInput span').forEach((s) => s.classList.toggle('on', Number(s.dataset.v) <= v));
+  // star picker: a real radio group, so arrow keys and screen readers work
+  $('#rateInput').addEventListener('change', (e) => {
+    const v = Number(e.target.value || 0);
+    $$('#rateInput label').forEach((l) => l.classList.toggle('on', Number(l.dataset.v) <= v));
   });
 
   $('#reviewForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = Object.fromEntries(new FormData(e.target).entries());
-    if (!Number(fd.rating)) return toast('Tap the stars to pick a rating first.', 'err');
+    fd.genuineClient = e.target.elements.genuineClient.checked;
+    if (!Number(fd.rating)) return toast('Choose a star rating first.', 'err');
+    if (!fd.genuineClient) return toast('Please confirm the genuine-client declaration.', 'err');
     const { ok: rOk, data: rData } = await api(`/agents/${encodeURIComponent(id)}/reviews`, {
       method: 'POST',
       body: JSON.stringify(fd),
@@ -176,9 +182,13 @@ async function openAgent(id, focusReview) {
     openAgent(id, false);
   });
 
+  if ($('#agentModal').hidden) lastFocus = document.activeElement;
   $('#agentModal').hidden = false;
   document.body.style.overflow = 'hidden';
-  if (focusReview) $('#reviewForm').scrollIntoView({ block: 'center' });
+  if (focusReview) {
+    $('#reviewForm').scrollIntoView({ block: 'center' });
+    $('#r5')?.focus();
+  } else $('#agentModal .modal-close').focus();
 }
 
 /* ------------------------------------------------ auth + dashboard */
@@ -206,6 +216,7 @@ function initAuth() {
     e.preventDefault();
     const fd = Object.fromEntries(new FormData(e.target).entries());
     const payload = { ...fd };
+    $$('#authForm input[type=checkbox]').forEach((c) => (payload[c.name] = c.checked));
     if (authMode === 'register') {
       payload.specialties = $$('#specialtySelect option:checked').map((o) => o.value);
       payload.languages = (fd.languages || '').split(',').map((s) => s.trim()).filter(Boolean);
@@ -214,6 +225,16 @@ function initAuth() {
     if (!ok) return toast(data.error || 'Something went wrong.', 'err');
     localStorage.setItem('agentToken', data.token);
     toast(authMode === 'register' ? 'Listing created — welcome!' : 'Welcome back!', 'ok');
+    await loadDirectory();
+    refreshSession();
+  });
+
+  $('#deleteAccountBtn').addEventListener('click', async () => {
+    if (!confirm('Permanently delete your account, public profile and all reviews? This cannot be undone.')) return;
+    const { ok, data } = await api('/agents/me', { method: 'DELETE' });
+    if (!ok) return toast(data.error || 'Could not delete the account.', 'err');
+    try { localStorage.removeItem('agentToken'); } catch { /* ignore */ }
+    toast(data.message, 'ok');
     await loadDirectory();
     refreshSession();
   });
@@ -243,8 +264,10 @@ function initAuth() {
   $('#payoutForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = Object.fromEntries(new FormData(e.target).entries());
-    const { ok, data } = await api('/agents/me/payout', { method: 'PUT', body: JSON.stringify(fd) });
-    if (!ok) return toast(data.error || 'Could not save payout details.', 'err');
+    const { ok, status, data } = await api('/agents/me/payout', { method: 'PUT', body: JSON.stringify(fd) });
+    if (!ok) {
+      return toast(status === 503 ? 'Payout storage isn’t enabled on this server yet — please contact us.' : data.error || 'Could not save payout details.', 'err');
+    }
     renderPayoutStatus(data.payout);
     e.target.reset();
     toast('Payout details saved — you’re set to receive A$99 per client.', 'ok');

@@ -22,10 +22,9 @@ const CORE_SECTIONS = [
     icon: '🪪',
     fields: [
       { id: 'fullName', label: 'Full name (as in passport)', type: 'text', required: true },
-      { id: 'dob', label: 'Date of birth', type: 'date', required: true },
+      { id: 'dob', label: 'Date of birth (age affects eligibility for many visas)', type: 'date', required: true },
       { id: 'nationality', label: 'Citizenship / nationality', type: 'text', required: true },
-      { id: 'passportNumber', label: 'Passport number', type: 'text', required: true },
-      { id: 'passportExpiry', label: 'Passport expiry date', type: 'date' },
+      { id: 'passportExpiry', label: 'Passport expiry date (optional — many visas need 6+ months validity)', type: 'date' },
       {
         id: 'maritalStatus',
         label: 'Relationship status',
@@ -33,6 +32,15 @@ const CORE_SECTIONS = [
         options: ['Single', 'Married', 'De facto', 'Divorced', 'Widowed'],
       },
       { id: 'dependants', label: 'Dependants coming with you (children etc.)', type: 'number' },
+      { id: 'guardianName', label: 'Parent or legal guardian’s full name (required for applicants under 18)', type: 'text', required: true, showIf: { under18: true } },
+      { id: 'guardianEmail', label: 'Parent or guardian’s email', type: 'text', required: true, showIf: { under18: true } },
+      {
+        id: 'guardianConsent',
+        label: 'I am the parent or legal guardian of this applicant and I consent to AusWise collecting and using their information as described in the Privacy Policy.',
+        type: 'boolean',
+        required: true,
+        showIf: { under18: true },
+      },
     ],
   },
   {
@@ -110,13 +118,27 @@ const CORE_SECTIONS = [
     fields: [
       { id: 'healthCondition', label: 'Any significant health conditions we should plan around?', type: 'select', options: YESNO },
       { id: 'charge', label: 'Any criminal convictions or pending charges (any country)?', type: 'select', options: YESNO },
-      { id: 'declareDetail', label: 'If yes to either — brief detail (kept confidential)', type: 'textarea', showIf: { anyYes: ['healthCondition', 'charge'] } },
+      { id: 'declareDetail', label: 'If yes to either — brief detail (optional, kept confidential)', type: 'textarea', showIf: { anyYes: ['healthCondition', 'charge'] } },
+      {
+        id: 'sensitiveConsent',
+        label: 'I consent to AusWise collecting the health and character information I have chosen to provide, only to assess my visa options.',
+        type: 'boolean',
+        required: true,
+        showIf: { anyYes: ['healthCondition', 'charge'] },
+      },
       {
         id: 'truthful',
         label: 'I confirm the information above is true and complete. Honest answers protect your application — non-disclosure is a common refusal reason.',
         type: 'boolean',
         required: true,
       },
+      {
+        id: 'privacyConsent',
+        label: 'I have read the Privacy Policy and agree to AusWise storing these answers to provide general information. I can ask for them to be deleted at any time.',
+        type: 'boolean',
+        required: true,
+      },
+      { id: 'emailCopy', label: 'Email me my reference number (optional — one email, with an unsubscribe link)', type: 'boolean' },
     ],
   },
 ];
@@ -211,8 +233,9 @@ export function getQuestionnaire(visaCode) {
     visaName: visa.name,
     category: visa.category,
     intro:
-      `This questionnaire mirrors a professional migration intake. Answer honestly — including refusals and gaps — ` +
-      `because full disclosure protects your application. Nothing here is sent to the government; it prepares your file and our advice.`,
+      `This questionnaire is modelled on professional client-intake forms. Answer honestly — including refusals and gaps — ` +
+      `because full disclosure protects your application. Nothing here is sent to the government. We only ask for what is needed: ` +
+      `no passport number, and health or character details only if you choose to share them.`,
     estimatedMinutes: 8,
     sections,
   };
@@ -233,7 +256,12 @@ export function validateResponses(questionnaire, answers = {}) {
   return missing;
 }
 
-function showIfMet(cond, answers) {
+export function showIfMet(cond, answers) {
   if (cond.anyYes) return cond.anyYes.some((id) => answers[id] === 'Yes');
   return Object.entries(cond).every(([k, v]) => answers[k] === v);
+}
+
+/** Every field id the questionnaire defines — anything else is dropped (data minimisation). */
+export function allowedFieldIds(questionnaire) {
+  return new Set(questionnaire.sections.flatMap((s) => s.fields.map((f) => f.id)));
 }
