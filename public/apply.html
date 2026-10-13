@@ -1,24 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Start your application — AusWise Migration</title>
   <meta name="description" content="Start your Australian visa application with a free, professional-grade questionnaire tailored to your visa type." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;450;500;550;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+  <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
-<body>
+<body data-crumb="Start your application">
   <div class="bg-decor" aria-hidden="true">
     <span class="blob blob-1"></span><span class="blob blob-3"></span>
     <span class="float-icon fi-2"></span><span class="float-icon fi-4"></span>
   </div>
 
   <header class="nav">
-    <a class="brand" href="/"><img class="brand-mark" src="/assets/logo.svg" alt="AusWise logo" width="36" height="36" /><span class="brand-name">Aus<span>Wise</span> Migration</span></a>
+    <a class="brand" href="/"><img class="brand-mark" src="/assets/logo.svg" alt="" width="36" height="36" /><span class="brand-name">Aus<span>Wise</span> Migration</span></a>
     <nav class="nav-links">
       <a href="/">Home</a>
       <a href="/#visas">Visas</a>
@@ -32,17 +30,17 @@
     <div class="page-hero">
       <span class="free-pill">100% free — no charge to start, complete or submit</span>
       <h1>Start your application</h1>
-      <p>The same intake questionnaire a professional consultancy uses — tailored to your visa. Your answers stay with us (never sent to the government) and set up honest, specific advice.</p>
+      <p>A detailed intake questionnaire modelled on professional client-intake forms, tailored to your visa. Your answers are never sent to the government, and you can delete them at any time.</p>
     </div>
 
     <section class="section">
       <!-- STEP 0: pick visa -->
       <div class="glass wizard" id="pickVisa">
-        <div class="wiz-section-title">Which visa are you applying for?</div>
+        <h2 class="wiz-section-title">Which visa are you applying for?</h2>
         <label>Choose your visa
           <select id="visaSelect"><option value="">Loading…</option></select>
         </label>
-        <p class="fineprint">Not sure which visa? Use the <a href="/#finder">30-second visa finder</a> first — it’s free.</p>
+        <p class="fineprint">Not sure which visa? Try the free <a href="/#finder">visa finder</a> first.</p>
         <div class="wiz-nav"><span></span><button class="btn btn-primary btn-lg" id="startBtn" disabled>Start questionnaire →</button></div>
       </div>
 
@@ -62,6 +60,7 @@
   </footer>
 
   <div class="toast" id="toast" hidden></div>
+  <script src="/js/site.js" type="module"></script>
   <script src="/js/apply.js" type="module"></script>
 </body>
 </html>

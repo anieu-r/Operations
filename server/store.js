@@ -32,6 +32,8 @@ const EMPTY = () => ({
   sessions: [],
   questionnaireResponses: [],
   institutionLeads: [],
+  privacyRequests: [],
+  suppressions: [],
 });
 
 let persistEnabled = true; // flips to false on first write failure
@@ -116,6 +118,18 @@ export function removeWhere(collection, where) {
   return removed;
 }
 
+/** Remove rows created before `cutoffMs` (epoch ms). Returns the count removed. */
+export function purgeOlderThan(collection, cutoffMs) {
+  const rows = memory[collection] || [];
+  const keep = rows.filter((r) => !r.createdAt || new Date(r.createdAt).getTime() >= cutoffMs);
+  const removed = rows.length - keep.length;
+  if (removed) {
+    memory[collection] = keep;
+    persist();
+  }
+  return removed;
+}
+
 function makeReference(collection) {
   const prefix =
     {
@@ -128,6 +142,8 @@ function makeReference(collection) {
       sessions: 'SES',
       questionnaireResponses: 'QNR',
       institutionLeads: 'INS',
+      privacyRequests: 'PRV',
+      suppressions: 'UNS',
     }[collection] || 'REF';
   const stamp = Date.now().toString(36).toUpperCase().slice(-5);
   const rand = Math.random().toString(36).toUpperCase().slice(2, 5);

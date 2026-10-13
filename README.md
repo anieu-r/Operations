@@ -11,12 +11,12 @@ It bundles everything a migration business needs on the front door:
 | 🔎 **Visa finder** | A 4-question wizard that recommends the visas worth exploring. |
 | 🗂️ **Visa catalogue** | 49 visa subclasses across every category — skilled, study, family, visitor, business, humanitarian, bridging, NZ stream and more — with plain-language guides, requirements, steps, documents, indicative fees and an official Home Affairs link. |
 | 📝 **SOP builder** | Generates a structured **Statement of Purpose** / Genuine Student statement from a few prompts, with tailored tips and a checklist. Copy or download as `.txt`. |
-| ✅ **VEVO entitlement check** | Implements the official **Home Affairs "(Visa) Entitlements"** API contract so organisations can verify a visa holder's work/study rights and conditions. |
+| ✅ **VEVO entitlement check** | Integrates the official **Home Affairs "(Visa) Entitlements"** API (contracts 1.0.34 and 1.0.38) so enrolled organisations can verify a visa holder's work/study rights and conditions, with holder consent and staff-only live access. |
 | 📰 **News & updates** | Source-linked summaries of significant immigration changes, plus deep-links to the Home Affairs newsroom for anything newer. |
 | 💳 **Fees & payments** | Explains how to pay **government charges directly to the official bodies** (ImmiAccount, BPAY, PayPal) — AusWise never collects government fees. Includes scam-safety guidance. |
 | 💚 **Free platform** | Everything is free. Exactly **two** optional paid extras (expert SOP review, one-on-one session) via Stripe Checkout — nothing else, ever. |
 | 📋 **Application questionnaires** | A professional-grade intake questionnaire tailored to every visa type (`/apply.html`), with autosave/resume, conditional fields and honest next-steps. |
-| 🧑‍💼 **MARN agent directory** | Agents register (free), log in (scrypt + bearer tokens) and manage a public profile; clients rate and review them (`/agents.html`). MARNs are format-checked with OMARA verify links everywhere; example profiles clearly flagged. Agents **earn A$99 per client session** — bank payout details are stored privately (masked, never public); use Stripe Connect or similar in production. |
+| 🧑‍💼 **MARN agent directory** | Agents register (free), log in (scrypt + bearer tokens) and manage a public profile; clients rate and review them (`/agents.html`). MARNs are format-checked with OMARA verify links everywhere; reviews need a genuine-client declaration and no fictional profiles or sample reviews exist. Agents **earn A$99 per client session** — bank payout details are encrypted at rest (AES-256-GCM) and never public; agents can delete their own account. |
 | 🏛️ **Institutions window** | Factual, commission-free directory of Australian universities & TAFEs with CRICOS links, plus a partner registration window for institutions (`/institutions.html`). |
 | ✉️ **Email notifications** | New enquiries, questionnaires, contact messages and SOP drafts are emailed to the business inbox (SMTP / Gmail). |
 | 🚀 **Enquiry + contact** | Lightweight intake forms persisted on the backend, each returning a reference number. |
@@ -41,7 +41,7 @@ Dev mode with auto-reload:
 npm run dev
 ```
 
-Run the smoke tests (19 checks across every endpoint):
+Run the smoke tests (101 checks, including VEVO against a mock of both API versions and every compliance rule):
 
 ```bash
 npm test
@@ -81,8 +81,14 @@ npm test
 ## VEVO — Visa Entitlement Verification (for organisations)
 
 The **Check visa** feature implements the official Department of Home Affairs
-**"(Visa) Entitlements"** API contract (`server/data/visa-entitlements.openapi.json`,
-v1.0.34). It validates requests against the official schema (required fields,
+**"(Visa) Entitlements"** API. Both published contracts are bundled
+(`server/data/visa-entitlements-1.0.34.openapi.json` and `-1.0.38.openapi.json`);
+choose one with `VEVO_API_VERSION` (default 1.0.38). Validation rules, categories
+and OAuth scopes are read from the selected spec, both rate-limit header formats
+are parsed, every call carries W3C `traceparent`/`tracestate`, and `GET /api/vevo/health`
+runs the spec's `HEAD` health check. Live checks need the visa holder's consent and an
+operator key (`VEVO_OPERATOR_KEY`); tokens can be fetched automatically over mTLS
+from your Access Manager machine certificate. It validates requests against the official schema (required fields,
 ICAO country code, passport length, date format) and returns the entitlement
 shape (visa status, work/study conditions, Medicare eligibility, residence, etc.).
 
@@ -112,6 +118,13 @@ to `NOTIFY_EMAIL`. Configure SMTP via `SMTP_URL` or `SMTP_HOST/PORT/USER/PASS`
 to the console (and still saved). Email sending never blocks or fails a submission.
 
 See `.env.example` for all variables.
+
+## Legal & compliance
+
+Privacy Policy, Terms, Refund Policy, Cookie Policy, a self-service data deletion page and an
+accessibility statement are included, with consent enforcement, data minimisation, encryption
+and no third-party trackers. See [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md) (20-point checklist and
+what you must configure before launch) and [`docs/THIRD_PARTY_AUDIT.md`](docs/THIRD_PARTY_AUDIT.md).
 
 ## Deploy
 

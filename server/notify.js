@@ -20,6 +20,7 @@
  */
 
 import nodemailer from 'nodemailer';
+import { businessDetails, isSuppressed, unsubscribeToken } from './privacy.js';
 
 const DEFAULT_TO = 'anmolr1098@gmail.com';
 
@@ -83,14 +84,57 @@ export async function notify(subject, lines) {
   }
 }
 
+/**
+ * Email a member of the public (opt-in only — e.g. "email me my reference").
+ * Spam Act 2003 compliant by construction: identifies the sender, includes a
+ * working unsubscribe link plus RFC 8058 one-click List-Unsubscribe headers,
+ * and is never sent to an address on the suppression list.
+ */
+export async function sendToUser({ to, subject, lines, baseUrl }) {
+  init();
+  if (!to || isSuppressed(to)) return false;
+  const biz = businessDetails();
+  const unsubUrl = `${baseUrl}/api/unsubscribe?e=${encodeURIComponent(to)}&t=${unsubscribeToken(to)}`;
+  const sender = [biz.legalName || biz.tradingName, biz.abn ? `ABN ${biz.abn}` : '', biz.address, biz.email]
+    .filter(Boolean)
+    .join(' · ');
+  const body = [
+    ...(Array.isArray(lines) ? lines : [String(lines || '')]),
+    '',
+    '—',
+    `Sent by ${sender}.`,
+    'You received this because you asked us to email you a copy. AusWise provides general information only.',
+    `Unsubscribe (one click): ${unsubUrl}`,
+  ].join('\n');
+  if (!transporter) {
+    console.log(`[notify:log-only] to applicant: ${subject}`);
+    return false;
+  }
+  try {
+    await transporter.sendMail({
+      from: from(),
+      to,
+      subject,
+      text: body,
+      headers: {
+        'List-Unsubscribe': `<${unsubUrl}>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      },
+    });
+    return true;
+  } catch (err) {
+    console.warn('[notify] applicant email failed:', err.message);
+    return false;
+  }
+}
+
 /** Build a readable notification from a saved submission record. */
 export function notifySubmission(kind, record) {
-  const label = { application: 'New visa enquiry', contact: 'New contact message', sop: 'New SOP draft generated' }[kind] || 'New submission';
+  const label = { application: 'New visa enquiry', contact: 'New contact message', sop: 'New SOP draft generated', privacy: 'Privacy request' }[kind] || 'New submission';
   const lines = [
     `${label}`,
     `Reference: ${record.reference || '-'}`,
     record.name ? `Name: ${record.name}` : '',
-    record.fullName ? `Name: ${record.fullName}` : '',
     record.email ? `Email: ${record.email}` : '',
     record.phone ? `Phone: ${record.phone}` : '',
     record.nationality ? `Nationality: ${record.nationality}` : '',

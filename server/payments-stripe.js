@@ -31,29 +31,27 @@ const CURRENCY = (process.env.STRIPE_CURRENCY || 'aud').toLowerCase();
 export const SERVICES = [
   {
     id: 'sop-review',
-    name: 'Expert SOP review',
+    name: 'SOP review by a registered migration agent',
     description:
-      'A professional reviews and polishes the SOP you built here (free) — structure, evidence, tone and the questions decision-makers actually ask.',
+      'A registered migration agent (MARN) reviews the SOP you built here (free) and gives written feedback on structure, evidence and tone.',
     amount: 7900,
-    popular: true,
   },
   {
     id: 'consult-1on1',
-    name: 'One-on-one detailed session',
+    name: 'One-on-one session with a registered migration agent',
     description:
-      'A private video/phone session to go deep on your situation: pathway strategy, points, timing, risks and a step-by-step plan. Delivered by a registered agent from our directory, who receives the full A$99 — we keep nothing.',
+      'A private video or phone session with a registered migration agent (MARN) from our directory to discuss your pathway, timing and risks. The agent receives the full A$99.',
     amount: 9900,
-    popular: true,
   },
 ];
 
 /** What the platform includes at no charge — shown alongside the paid extras. */
 export const FREE_FEATURES = [
   'Every visa guide, requirement list and document checklist',
-  'The 30-second visa finder',
+  'The visa finder quiz',
   'The full application questionnaire for every visa type',
   'The SOP builder with live preview (build unlimited drafts)',
-  'VEVO visa-conditions checks',
+  'The VEVO demo (live checks are for enrolled organisations)',
   'Immigration news and official links',
   'The MARN agent directory, ratings and reviews',
   'The education institutions directory',
@@ -76,11 +74,11 @@ export function publicConfig() {
       description: s.description,
       amount: s.amount,
       display: formatMoney(s.amount, CURRENCY),
-      popular: Boolean(s.popular),
     })),
+    priceNote: 'Prices are in Australian dollars and are the total you pay — GST included where applicable. No booking fees, card surcharges or subscriptions. See the Refund Policy for cancellations.',
     note: isStripeConfigured()
-      ? 'The platform is free. These two optional extras are the only things we charge for — secure checkout by Stripe. Government visa charges are always paid separately, directly to Home Affairs.'
-      : 'The platform is free. The two optional extras aren’t payable online in this deployment yet — send a free enquiry and we’ll arrange it. (Set STRIPE_SECRET_KEY to enable Stripe Checkout.)',
+      ? 'These two optional extras are the only things we charge for. Payment is handled securely by Stripe. Government visa charges are separate and paid directly to Home Affairs.'
+      : 'Online payment isn’t switched on yet — send a free enquiry if you want one of these extras. Government visa charges are separate and paid directly to Home Affairs.',
   };
 }
 
@@ -130,9 +128,10 @@ export async function createCheckoutSession({ serviceId, email, baseUrl }) {
 
 function formatMoney(amountCents, currency) {
   try {
-    return new Intl.NumberFormat('en-AU', { style: 'currency', currency: currency.toUpperCase() }).format(
-      amountCents / 100
-    );
+    // Show the currency explicitly ("A$79") so overseas visitors aren't misled about the price.
+    const code = currency.toUpperCase();
+    const n = new Intl.NumberFormat('en-AU', { minimumFractionDigits: amountCents % 100 ? 2 : 0 }).format(amountCents / 100);
+    return code === 'AUD' ? `A$${n}` : `${code} ${n}`;
   } catch {
     return `$${(amountCents / 100).toFixed(2)}`;
   }

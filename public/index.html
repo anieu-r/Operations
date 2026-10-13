@@ -1,14 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AusWise Migration — Apply for Australian visas the easy way</title>
   <meta name="description" content="AusWise Migration makes applying for Australian visas simple. Find your visa in 30 seconds, build your Statement of Purpose, read the latest Home Affairs updates, and pay official fees the right way." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;450;500;550;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+  <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
@@ -28,7 +26,7 @@
   <!-- NAV -->
   <header class="nav">
     <a class="brand" href="#top">
-      <img class="brand-mark" src="/assets/logo.svg" alt="AusWise Migration logo" width="36" height="36" />
+      <img class="brand-mark" src="/assets/logo.svg" alt="" width="36" height="36" />
       <span class="brand-name">Aus<span>Wise</span> Migration</span>
     </a>
     <nav class="nav-links">
@@ -44,31 +42,31 @@
     <button class="nav-toggle" aria-label="Open menu">☰</button>
   </header>
 
-  <div class="free-strip">AusWise is <b>100% free to use</b> — you only ever pay for two optional extras: an expert SOP review or a one-on-one session. <a href="#services">See exactly what's free →</a></div>
+  <div class="free-strip">AusWise is <b>100% free to use</b> — you only ever pay for two optional extras with a registered migration agent: an SOP review or a one-on-one session. <a href="#services">See exactly what's free →</a></div>
 
   <main id="top">
     <!-- HERO -->
     <section class="hero">
       <div class="hero-inner">
-        <span class="pill">Onshore &amp; offshore · every visa type · built on official sources</span>
+        <span class="pill">Onshore, offshore or either · linked to official sources</span>
         <h1>Your Australian visa,<br /><span class="hl">clearly</span> explained.</h1>
         <p class="lede">
           First time applying? Good. We built this for you — plain language, real steps,
-          honest advice, and every fee paid <strong>directly to the official bodies</strong>.
+          honest information, and every fee paid <strong>directly to the official bodies</strong>.
         </p>
         <div class="hero-cta">
-          <a href="#finder" class="btn btn-primary btn-lg">Find my visa — 30 seconds</a>
+          <a href="#finder" class="btn btn-primary btn-lg">Find my visa — 4 quick questions</a>
           <a href="#visas" class="btn btn-ghost btn-lg">Browse all visas</a>
         </div>
         <ul class="hero-stats" id="heroStats">
           <li><strong id="statVisas">—</strong><span>visa types</span></li>
-          <li><strong>2</strong><span>onshore &amp; offshore</span></li>
-          <li><strong>100%</strong><span>official sources</span></li>
+          <li><strong>Free</strong><span>to use</span></li>
+          <li><strong>Every</strong><span>guide links to Home Affairs</span></li>
         </ul>
       </div>
       <div class="hero-card glass" aria-hidden="true">
         <div class="hc-row"><span class="hc-emoji">01</span><div><b>Find your visa</b><small>Skilled, student, partner, visitor &amp; more</small></div></div>
-        <div class="hc-row"><span class="hc-emoji">02</span><div><b>Answer the questionnaire</b><small>Professional intake, tailored to your visa</small></div></div>
+        <div class="hc-row"><span class="hc-emoji">02</span><div><b>Answer the questionnaire</b><small>Detailed intake, tailored to your visa</small></div></div>
         <div class="hc-row"><span class="hc-emoji">03</span><div><b>Build your SOP</b><small>Guided statement with live preview</small></div></div>
         <div class="hc-row"><span class="hc-emoji">04</span><div><b>Lodge &amp; pay officially</b><small>Direct to Home Affairs via ImmiAccount</small></div></div>
       </div>
@@ -76,7 +74,7 @@
 
     <!-- TRUST STRIP -->
     <section class="trust">
-      <p>Built around the <strong>Department of Home Affairs</strong> — every visa links to the official page. We never take government fees.</p>
+      <p>Every visa guide links to the official <strong>Department of Home Affairs</strong> page. AusWise is an <strong>independent business, not affiliated with the Australian Government</strong>, and never takes government fees.</p>
     </section>
 
     <!-- VISA FINDER -->
@@ -84,7 +82,7 @@
       <div class="section-head">
         <span class="eyebrow">Visa finder</span>
         <h2>Which visa fits you?</h2>
-        <p>Tap the answers that fit you. We’ll suggest the visas worth exploring — in about 30 seconds.</p>
+        <p>Answer four quick questions and we’ll show visas worth exploring. This is general information, not advice on your eligibility.</p>
       </div>
       <div class="finder glass" id="finder-app">
         <div class="finder-progress"><span id="finderBar"></span></div>
@@ -168,7 +166,7 @@
               </select></label>
           </div>
           <button class="btn btn-primary" type="submit">Generate my draft</button>
-          <p class="fineprint">Free &amp; unlimited. The preview updates live as you type. We store only your name, purpose and subclass — not the free-text details.</p>
+          <p class="fineprint">Free and unlimited. The preview updates as you type. We keep only the purpose and subclass — never your name or what you write. This tool produces a general template; it is not immigration assistance. For advice on your application, see a registered migration agent.</p>
         </form>
         <div class="sop-output glass" id="sopOutput">
           <div class="sop-placeholder">
@@ -184,7 +182,7 @@
       <div class="section-head">
         <span class="eyebrow">VEVO check</span>
         <h2>Check a visa’s conditions</h2>
-        <p>For employers, education providers and agencies. Verify a visa holder’s work rights, study rights and conditions using the official <strong>Home Affairs Visa Entitlement Verification</strong> contract.</p>
+        <p>For employers, education providers and agencies enrolled with Home Affairs. Built on the official <strong>(Visa) Entitlements API</strong> (contract versions 1.0.34 and 1.0.38). <a id="vevoSelf" target="_blank" rel="noopener">Checking your own visa? Use the free official VEVO service ↗</a></p>
       </div>
       <div class="vevo-wrap">
         <form class="vevo-form glass" id="vevoForm">
@@ -201,8 +199,10 @@
             <label>Issuing country (3-letter) *<input name="travelDocumentIssuingCountry" required maxlength="3" placeholder="e.g. AUS" style="text-transform:uppercase" /></label>
           </div>
           <label>Date of birth *<input name="birthDate" type="date" required /></label>
+          <label id="operatorField" hidden>Operator key (authorised staff only) *<input name="operatorKey" type="password" autocomplete="off" /></label>
+          <label class="check"><input type="checkbox" name="holderConsent" required /> <span>The visa holder has consented to this check, and I am checking for a lawful purpose of my organisation.</span></label>
           <button class="btn btn-primary" type="submit">Run entitlement check</button>
-          <p class="fineprint">Only check people who have consented. The live service requires organisation enrolment via Home Affairs Access Manager. In demo mode, results are simulated and clearly labelled.</p>
+          <p class="fineprint">We never store or log the details you enter here. Live checks use the organisation’s Home Affairs enrolment and are limited to its authorised staff. In demo mode, results are simulated and labelled.</p>
         </form>
         <div class="vevo-output glass" id="vevoOutput">
           <div class="sop-placeholder">
@@ -244,15 +244,25 @@
       <div class="section-head">
         <span class="eyebrow">Pricing</span>
         <h2>Free platform, honest pricing</h2>
-        <p>Everything you need to understand and prepare your application is free. There are exactly <strong>two</strong> optional paid extras — nothing else, ever. Government visa charges always go directly to Home Affairs, never through us.</p>
+        <p>The information and tools on this site are free to use. There are <strong>two</strong> optional paid extras, both delivered by registered migration agents — that is the full price list. Government visa charges are separate and always paid directly to Home Affairs.</p>
       </div>
       <div class="glass free-card">
-        <h3>Free — all of it, forever</h3>
+        <h3>Free to use</h3>
         <ul class="free-list" id="freeList"></ul>
       </div>
       <div class="pay-note-banner glass" id="payBanner" hidden></div>
       <div class="services-grid" id="servicesGrid"></div>
+      <p class="fineprint center" id="priceNote"></p>
       <p class="fineprint center" id="payFootnote"></p>
+    </section>
+
+    <!-- MISSION -->
+    <section id="why" class="section">
+      <div class="mission">
+        <span class="eyebrow">Why AusWise</span>
+        <h2>Visa information that respects your time</h2>
+        <p>Applying for an Australian visa for the first time can mean reading dozens of official pages. AusWise brings the key information together in plain language, links every guide back to its official source, and is upfront about what is free and what is not.</p>
+      </div>
     </section>
 
     <!-- TRANSPARENCY -->
@@ -260,11 +270,11 @@
       <div class="section-head">
         <span class="eyebrow">Transparency</span>
         <h2>Our promises — nothing hidden</h2>
-        <p>Migration is full of agencies that hide fees, oversell chances and bury the fine print. We built this platform to end that.</p>
+        <p>Fees, chances and fine print should be clear before you commit to anything. Here is what we commit to.</p>
       </div>
       <div class="promise-grid">
-        <div class="promise"><h4>Honest feedback, even when it hurts</h4><p>If your case is weak, we say so and explain why — before you spend a cent or lodge anything.</p></div>
-        <div class="promise"><h4>Primary sources everywhere</h4><p>Every visa, fee and rule links to the official Home Affairs page so you can verify us in one click.</p></div>
+        <div class="promise"><h4>Straight answers about the rules</h4><p>We explain requirements plainly, including the ones that commonly lead to refusals. Personal advice on your case comes from a registered migration agent.</p></div>
+        <div class="promise"><h4>Check us against the source</h4><p>Every visa guide links to the official Home Affairs page, so you can verify the details in one click.</p></div>
         <div class="promise"><h4>No commissions, no pay-to-rank</h4><p>Agents and institutions can't pay for placement or better ratings. Reviews appear as submitted.</p></div>
         <div class="promise"><h4>Government fees go to the government</h4><p>Visa application charges are paid directly to Home Affairs via ImmiAccount. We never touch them.</p></div>
         <div class="promise"><h4>Two paid extras, clearly labelled</h4><p>An SOP review and a 1:1 session. That's the entire price list. Everything else is free.</p></div>
@@ -277,7 +287,7 @@
       <div class="section-head">
         <span class="eyebrow">Get started</span>
         <h2>Start your application</h2>
-        <p>Tell us your situation and we’ll point you to the right pathway. No payment needed to enquire.</p>
+        <p>Tell us your situation and we’ll reply with general information about your options. Enquiries are free.</p>
       </div>
       <div class="apply-wrap">
         <form class="apply-form glass" id="applyForm">
@@ -304,22 +314,27 @@
           </div>
           <label>Tell us about your situation
             <textarea name="message" rows="3" placeholder="A few lines about your goals, study/work history, family in Australia, etc."></textarea></label>
+          <label class="check"><input type="checkbox" name="privacyConsent" required /> <span>I have read the <a href="/privacy.html">Privacy Policy</a> and agree to AusWise storing my enquiry to reply to me. *</span></label>
+          <label class="check"><input type="checkbox" name="ageConfirm" required /> <span>I am 18 or over, or I am a parent or guardian enquiring for someone under 18. *</span></label>
+          <label class="check"><input type="checkbox" name="emailCopy" /> <span>Email me my reference number (optional — one email with an unsubscribe link).</span></label>
           <button class="btn btn-primary btn-lg" type="submit">Send my enquiry</button>
         </form>
         <aside class="apply-side glass">
           <h3>What happens next?</h3>
           <ol class="steps">
-            <li>We review your enquiry and suggest the best-fit visa(s).</li>
-            <li>You get a simple checklist of documents.</li>
+            <li>We reply with general information about visas that may fit.</li>
+            <li>You get the official document checklist and links.</li>
+            <li>For personal advice, we can connect you with a registered migration agent.</li>
             <li>You lodge in <b>ImmiAccount</b> and pay Home Affairs directly.</li>
-            <li>We help you track progress and updates.</li>
           </ol>
           <div class="divider"></div>
           <h3>Just have a question?</h3>
           <form id="contactForm" class="contact-mini">
-            <input name="name" placeholder="Name" required />
-            <input name="email" type="email" placeholder="Email" required />
-            <textarea name="message" rows="2" placeholder="Your question" required></textarea>
+            <label class="sr-only" for="cName">Name</label><input id="cName" name="name" placeholder="Name" required />
+            <label class="sr-only" for="cEmail">Email</label><input id="cEmail" name="email" type="email" placeholder="Email" required />
+            <label class="sr-only" for="cMsg">Your question</label><textarea id="cMsg" name="message" rows="2" placeholder="Your question" required></textarea>
+            <label class="check"><input type="checkbox" name="privacyConsent" required /> <span>I agree to the <a href="/privacy.html">Privacy Policy</a>. *</span></label>
+            <label class="check"><input type="checkbox" name="ageConfirm" required /> <span>I am 18+ or a parent/guardian. *</span></label>
             <button class="btn btn-ghost" type="submit">Send message</button>
           </form>
         </aside>
@@ -331,8 +346,8 @@
   <footer class="footer">
     <div class="footer-grid">
       <div>
-        <a class="brand" href="#top"><img class="brand-mark" src="/assets/logo.svg" alt="AusWise Migration logo" width="36" height="36" /><span class="brand-name">Aus<span>Wise</span></span></a>
-        <p class="muted">Making Australian migration simple, honest and stress-free.</p>
+        <a class="brand" href="#top"><img class="brand-mark" src="/assets/logo.svg" alt="" width="36" height="36" /><span class="brand-name">Aus<span>Wise</span></span></a>
+        <p class="muted">Plain-language information about Australian visas.</p>
       </div>
       <div>
         <h4>Explore</h4>
@@ -352,16 +367,16 @@
       </div>
     </div>
     <div class="disclaimer">
-      <p><strong>Important:</strong> AusWise Migration is an information and document-preparation tool. It is <strong>not</strong> a government agency and does not provide legal or migration advice. Information is general only and may change — always confirm details and current fees on the
+      <p><strong>Important:</strong> AusWise Migration provides general information and self-help tools. It is <strong>not</strong> a government agency and does not provide immigration assistance, legal advice or migration advice. Information is general only and may change — always confirm details and current fees on the
         <a href="https://immi.homeaffairs.gov.au/" target="_blank" rel="noopener">Department of Home Affairs</a> website. For advice tailored to your situation, consult a registered migration agent (OMARA) or an Australian legal practitioner. Government Visa Application Charges are paid directly to Home Affairs via ImmiAccount.</p>
-      <p class="muted">© <span id="year"></span> AusWise Migration. Demo project. Not affiliated with the Australian Government.</p>
+      <p class="muted">© <span id="year"></span> AusWise Migration. Not affiliated with the Australian Government.</p>
     </div>
   </footer>
 
   <!-- VISA MODAL -->
   <div class="modal" id="visaModal" hidden>
     <div class="modal-backdrop" data-close></div>
-    <div class="modal-card glass" role="dialog" aria-modal="true">
+    <div class="modal-card glass" role="dialog" aria-modal="true" aria-label="Visa guide">
       <button class="modal-close" data-close aria-label="Close">✕</button>
       <div id="modalBody"></div>
     </div>
@@ -370,6 +385,7 @@
   <!-- TOAST -->
   <div class="toast" id="toast" hidden></div>
 
+  <script src="/js/site.js" type="module"></script>
   <script src="/js/app.js" type="module"></script>
 </body>
 </html>
